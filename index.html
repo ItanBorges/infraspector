@@ -1,0 +1,2588 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>InfraSpec v3.0 - Engenharia de Infraestrutura, CFTV, Energia & Redes</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              cyan: '#00d2ff',
+              cyanHover: '#00b8e6',
+              sky: '#38bdf8',
+              teal: '#5c89a6',
+              darkBg: '#070d14',
+              cardBg: '#0d1723',
+              cardHover: '#111f30',
+              border: '#1c2f45',
+              borderLight: '#273f5a'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #070d14;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #1c2f45;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #00d2ff;
+    }
+
+    /* Accordions & Tabs styling */
+    details>summary {
+      list-style: none;
+    }
+
+    details>summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details[open] summary .accordion-icon {
+      transform: rotate(180deg);
+    }
+
+    /* Glowing accents */
+    .glow-cyan-sm {
+      box-shadow: 0 0 12px rgba(0, 210, 255, 0.15);
+    }
+
+    .glow-cyan-hover:hover {
+      box-shadow: 0 0 16px rgba(0, 210, 255, 0.25);
+    }
+
+    /* Print styles ABNT A4 */
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 12mm 10mm;
+      }
+
+      body {
+        background-color: #ffffff !important;
+        color: #0f172a !important;
+        font-size: 10.5px !important;
+      }
+
+      .no-print {
+        display: none !important;
+      }
+
+      .print-only {
+        display: block !important;
+      }
+
+      .break-inside-avoid {
+        page-break-inside: avoid;
+        break-inside: avoid;
+      }
+
+      table {
+        font-size: 10px !important;
+      }
+
+      th,
+      td {
+        padding: 4.5px 6px !important;
+      }
+
+      .border,
+      .border-brand-border,
+      .border-slate-700 {
+        border-color: #cbd5e1 !important;
+        color: #0f172a !important;
+      }
+
+      .bg-brand-cardBg,
+      .bg-brand-darkBg,
+      .bg-slate-900,
+      .bg-slate-800 {
+        background-color: #ffffff !important;
+        color: #0f172a !important;
+      }
+
+      .text-white,
+      .text-brand-cyan,
+      .text-slate-300,
+      .text-slate-400 {
+        color: #0f172a !important;
+      }
+
+      .text-brand-sky {
+        color: #0369a1 !important;
+      }
+    }
+
+    @media screen {
+      .print-only {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+
+<body
+  class="bg-[#070d14] text-slate-200 min-h-screen antialiased flex flex-col justify-between selection:bg-cyan-500 selection:text-slate-950">
+
+  <!-- ========================================== -->
+  <!-- BARRA SUPERIOR (HEADER EXECUTIVO)          -->
+  <!-- ========================================== -->
+  <header class="no-print bg-[#0a121c]/95 backdrop-blur-md border-b border-brand-border sticky top-0 z-50 shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 py-2.5 flex flex-wrap justify-between items-center gap-3">
+
+      <!-- LOGO & TÍTULO -->
+      <div class="flex items-center gap-3">
+        <div class="relative group cursor-pointer" onclick="selecionarModulo('cabeamento')">
+          <img src="img/is-logo.jpg" alt="InfraSpec Logo"
+            class="h-40 w-40 rounded-xl object-contain border border-brand-cyan/40 shadow-sm group-hover:border-brand-cyan transition duration-200" />
+          <div class="absolute inset-0 rounded-xl bg-cyan-400/10 blur-sm opacity-0 group-hover:opacity-100 transition">
+          </div>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-lg font-black tracking-tight text-white flex items-center">
+              Infra<span class="text-brand-cyan">Spec</span>
+            </span>
+            <span
+              class="text-[10px] font-bold bg-cyan-950/80 text-brand-cyan border border-cyan-800/60 px-2 py-0.5 rounded-full uppercase tracking-wider">
+              v3.0 Pro
+            </span>
+          </div>
+          <p class="text-[11px] text-brand-teal hidden sm:block">Engenharia de Infraestrutura, CFTV, Energia & Redes</p>
+        </div>
+      </div>
+
+      <!-- PAINEL DE IDENTIFICAÇÃO / USUÁRIO ATIVO -->
+      <div class="flex items-center gap-2.5">
+        <!-- Badge de Usuário -->
+        <div id="userBadgeArea"
+          class="flex items-center bg-[#0d1825] border border-brand-border rounded-xl px-2.5 py-1 text-xs">
+          <div id="userAvatar"
+            class="h-6 w-6 rounded-lg bg-cyan-950 border border-brand-cyan text-brand-cyan flex items-center justify-center font-bold text-[10px] mr-2">
+            --
+          </div>
+          <div class="text-left leading-tight mr-2">
+            <div id="userDisplayName" class="font-semibold text-slate-200 truncate max-w-[130px]">Não Identificado</div>
+            <div id="userDisplayPhone" class="text-[10px] text-slate-400 font-mono">Clique para logar</div>
+          </div>
+          <button type="button" onclick="abrirModalUsuario()"
+            class="text-[11px] text-brand-cyan hover:text-cyan-300 font-medium px-1.5 py-0.5 bg-cyan-950/50 hover:bg-cyan-900/60 rounded border border-cyan-800/40 transition">
+            Alterar
+          </button>
+        </div>
+
+        <!-- Ações Globais de Projeto -->
+        <button type="button" onclick="abrirModalProjetos()"
+          class="text-xs bg-[#0d1825] hover:bg-[#122234] text-slate-200 border border-brand-border rounded-xl px-2.5 py-1.5 font-medium transition flex items-center gap-1.5 shadow-sm"
+          title="Gerenciar Projetos Salvos">
+          <svg class="w-3.5 h-3.5 text-brand-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+          </svg>
+          <span class="hidden md:inline">Projetos</span>
+        </button>
+
+        <button type="button" onclick="salvarProjetoAtual()"
+          class="text-xs bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-bold rounded-xl px-3 py-1.5 transition flex items-center gap-1.5 shadow-sm glow-cyan-sm"
+          title="Salvar Projeto Atual">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+          </svg>
+          <span>Salvar</span>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- ABAS DE NAVEGAÇÃO ENTRE OS MÓDULOS -->
+    <nav
+      class="max-w-7xl mx-auto px-4 flex items-center gap-1 overflow-x-auto border-t border-brand-border/60 py-1.5 text-xs select-none">
+      <button type="button" id="tabBtn_cabeamento" onclick="selecionarModulo('cabeamento')"
+        class="tab-btn px-3 py-1.5 rounded-lg font-semibold flex items-center gap-1.5 transition whitespace-nowrap bg-cyan-950 text-brand-cyan border border-cyan-800/80 shadow-sm">
+        <span>🌐</span> Cabeamento & Redes
+      </button>
+      <button type="button" id="tabBtn_cftv" onclick="selecionarModulo('cftv')"
+        class="tab-btn px-3 py-1.5 rounded-lg font-medium flex items-center gap-1.5 transition whitespace-nowrap text-slate-400 hover:text-slate-200 hover:bg-[#0e1927]">
+        <span>📹</span> Rack & CFTV
+      </button>
+      <button type="button" id="tabBtn_energia" onclick="selecionarModulo('energia')"
+        class="tab-btn px-3 py-1.5 rounded-lg font-medium flex items-center gap-1.5 transition whitespace-nowrap text-slate-400 hover:text-slate-200 hover:bg-[#0e1927]">
+        <span>⚡</span> Energia & Nobreak
+      </button>
+      <button type="button" id="tabBtn_wifi" onclick="selecionarModulo('wifi')"
+        class="tab-btn px-3 py-1.5 rounded-lg font-medium flex items-center gap-1.5 transition whitespace-nowrap text-slate-400 hover:text-slate-200 hover:bg-[#0e1927]">
+        <span>📶</span> Expansão Wi-Fi
+      </button>
+      <div class="h-4 w-px bg-brand-border mx-1"></div>
+      <button type="button" id="tabBtn_consolidado" onclick="selecionarModulo('consolidado')"
+        class="tab-btn px-3.5 py-1.5 rounded-lg font-bold flex items-center gap-1.5 transition whitespace-nowrap text-brand-sky hover:text-cyan-300 hover:bg-[#0e1927]">
+        <span>📑</span> Laudo Consolidado
+      </button>
+    </nav>
+  </header>
+
+  <!-- ========================================== -->
+  <!-- CABEÇALHO DO LAUDO ABNT (EXCLUSIVO PRINT)  -->
+  <!-- ========================================== -->
+  <section class="print-only mb-6 border-b-2 border-slate-900 pb-4">
+    <div class="flex justify-between items-center gap-4">
+      <div class="flex items-center gap-3">
+        <img src="img/is-logo.jpg" alt="InfraSpec Logo" class="h-14 w-14 object-contain rounded" />
+        <div>
+          <h1 class="text-2xl font-black tracking-tight text-slate-950 uppercase leading-none">InfraSpec v3.0</h1>
+          <p class="text-xs font-bold text-blue-900 uppercase tracking-wider mt-1">Laudo de Especificação Técnica &
+            Memorial Quantitativo</p>
+          <p class="text-[9.5px] text-slate-600 font-mono mt-0.5" id="printDataEmissao"></p>
+        </div>
+      </div>
+      <div class="text-right text-[10.5px] text-slate-700 leading-tight">
+        <p class="font-bold text-slate-900 text-xs" id="printNomeEmpresa"></p>
+        <p id="printRespTecnico"></p>
+        <p id="printRegistro"></p>
+        <p id="printContato"></p>
+      </div>
+    </div>
+    <div class="mt-3 grid grid-cols-2 gap-2 bg-slate-100 p-2.5 rounded border border-slate-300 text-[10.5px]">
+      <div>
+        <span class="font-bold text-slate-800">Projeto / Instalação:</span>
+        <span id="printNomeProjeto" class="font-semibold text-slate-900 ml-1"></span>
+      </div>
+      <div>
+        <span class="font-bold text-slate-800">Cliente / Contratante:</span>
+        <span id="printNomeCliente" class="font-semibold text-slate-900 ml-1"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================== -->
+  <!-- CONTEÚDO PRINCIPAL (WORKSPACES)            -->
+  <!-- ========================================== -->
+  <main class="max-w-7xl mx-auto px-4 py-5 w-full flex-grow">
+
+    <!-- BARRA DE IDENTIFICAÇÃO DO PROJETO COMPARTILHADA -->
+    <div class="no-print mb-4 bg-brand-cardBg border border-brand-border rounded-xl p-3 shadow-md">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-3 items-center">
+        <div>
+          <label class="block text-[11px] font-semibold text-brand-teal uppercase tracking-wider mb-1">Nome do
+            Projeto</label>
+          <input type="text" id="projetoNome" placeholder="Ex: Hospital Samaritano - Ala Sul"
+            oninput="sincronizarNomeProjeto()"
+            class="w-full bg-[#070d14] border border-brand-border rounded-lg px-2.5 py-1.5 text-xs text-white focus:border-brand-cyan focus:outline-none" />
+        </div>
+        <div>
+          <label class="block text-[11px] font-semibold text-brand-teal uppercase tracking-wider mb-1">Cliente /
+            Solicitante</label>
+          <input type="text" id="projetoCliente" placeholder="Ex: Hospital Samaritano"
+            class="w-full bg-[#070d14] border border-brand-border rounded-lg px-2.5 py-1.5 text-xs text-white focus:border-brand-cyan focus:outline-none" />
+        </div>
+        <div>
+          <label class="block text-[11px] font-semibold text-brand-teal uppercase tracking-wider mb-1">Empresa
+            Executora</label>
+          <input type="text" id="projetoEmpresa" placeholder="Ex: Tech Solutions TI"
+            class="w-full bg-[#070d14] border border-brand-border rounded-lg px-2.5 py-1.5 text-xs text-white focus:border-brand-cyan focus:outline-none" />
+        </div>
+        <div>
+          <label class="block text-[11px] font-semibold text-brand-teal uppercase tracking-wider mb-1">Registro (CFT /
+            CREA)</label>
+          <input type="text" id="projetoRegistro" placeholder="Ex: CFT 123456-BR"
+            class="w-full bg-[#070d14] border border-brand-border rounded-lg px-2.5 py-1.5 text-xs text-white focus:border-brand-cyan focus:outline-none" />
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- MÓDULO 1: CABEAMENTO ESTRUTURADO & REDES (ENGINE V2.3 HOMOLOGADA)        -->
+    <!-- ========================================================================= -->
+    <section id="modulo_cabeamento" class="modulo-view">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+
+        <!-- Formulário Módulo 1 -->
+        <div class="no-print lg:col-span-5 space-y-3">
+          <div
+            class="flex justify-between items-center bg-brand-cardBg p-3 rounded-xl border border-brand-border shadow-sm">
+            <span class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+              <span class="text-brand-cyan">🌐</span> Parâmetros de Cabeamento
+            </span>
+            <div class="flex gap-2">
+              <button type="button" onclick="alternarTodosAcordeoes(true, 'acc_cab')"
+                class="text-[11px] font-semibold text-brand-cyan hover:text-cyan-300">Expandir</button>
+              <span class="text-slate-600">|</span>
+              <button type="button" onclick="alternarTodosAcordeoes(false, 'acc_cab')"
+                class="text-[11px] font-semibold text-slate-400 hover:text-slate-200">Recolher</button>
+            </div>
+          </div>
+
+          <form id="formCabeamento" onsubmit="event.preventDefault(); calcularModuloCabeamento();" class="space-y-3">
+
+            <!-- Acordeão: Pontos & Cabo Horizontal -->
+            <details class="acc_cab bg-brand-cardBg rounded-xl border border-brand-border overflow-hidden" open>
+              <summary
+                class="flex justify-between items-center px-4 py-3 cursor-pointer bg-[#0e1927] hover:bg-[#132233] transition font-bold text-xs text-slate-200 select-none">
+                <span>1. Pontos RJ45 & Cabeamento Horizontal</span>
+                <span class="accordion-icon transition-transform duration-200 text-slate-400">▼</span>
+              </summary>
+              <div class="p-4 space-y-3 border-t border-brand-border bg-brand-cardBg">
+                <div>
+                  <label class="block text-xs font-bold text-slate-200 mb-1" for="cab_pontos">Quantidade de Pontos
+                    Ativos RJ45</label>
+                  <input type="number" id="cab_pontos" min="1" placeholder="Ex: 24" value="24"
+                    class="w-full bg-[#070d14] border border-cyan-500/40 focus:border-brand-cyan rounded-lg px-3 py-2 text-brand-cyan focus:outline-none font-bold text-lg font-mono" />
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                  <div>
+                    <label class="block text-[11px] font-semibold text-slate-300 mb-1" for="cab_categoria">Categoria do
+                      Cabo</label>
+                    <select id="cab_categoria"
+                      class="w-full bg-[#070d14] border border-brand-border rounded-lg px-2.5 py-1.5 text-xs text-slate-200 focus:border-brand-cyan">
+                      <option value="Cat6" selected>Cat6 (1Gbps/10G curto)</option>
+                      <option value="Cat5e">Cat5e (1Gbps padrão)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-[11px] font-semibold text-slate-300 mb-1"
+                      for="cab_blindagem">Blindagem</label>
+                    <select id="cab_blindagem"
+                      class="w-full bg-[#070d14] border border-brand-border rounded-lg px-2.5 py-1.5 text-xs text-slate-200 focus:border-brand-cyan">
+                      <option value="UTP" selected>UTP (Não Blindado)</option>
+                      <option value="FTP">FTP (Blindado)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="bg-[#070d14] p-3 rounded-lg border border-brand-border space-y-2.5">
+                  <div>
+                    <label class="block text-[11px] font-semibold text-slate-300 mb-1" for="cab_tipoMedicao">Método de
+                      Medição de Lances</label>
+                    <select id="cab_tipoMedicao" onchange="alternarModoMedicaoCab()"
+                      class="w-full bg-[#0c1522] border border-brand-border rounded-lg px-2.5 py-1.5 text-xs text-slate-200">
+                      <option value="absoluta" selected>Metragem Absoluta (Soma da Planta)</option>
+                      <option value="media">Distância Média por Ponto</option>
+                    </select>
+                  </div>
+                  <div id="cab_blocoMetragemAbsoluta">
+                    <label class="block text-[11px] font-semibold text-slate-400 mb-1"
+                      for="cab_metragemAbsoluta">Metragem Total da Planta (m)</label>
+                    <input type="number" id="cab_metragemAbsoluta" min="1" step="1" value="480" placeholder="Ex: 480"
+                      class="w-full bg-[#070d14] border border-brand-border rounded-lg px-2.5 py-1.5 text-xs text-white" />
+                  </div>
+                  <div id="cab_blocoDistanciaMedia" class="hidden">
+                    <label class="block text-[11px] font-semibold text-slate-400 mb-1"
+                      for="cab_distanciaMedia">Distância Média por Ponto (m)</label>
+                    <input type="number" id="cab_distanciaMedia" min="1" step="0.5" placeholder="Ex: 20"
+                      class="w-full bg-[#070d14] border border-brand-border rounded-lg px-2.5 py-1.5 text-xs text-white" />
+                  </div>
+                  <div>
+                    <label class="block text-[11px] font-semibold text-slate-400 mb-1" for="cab_reserva">Margem Técnica
+                      de Subidas / Curvas (%)</label>
+                    <input type="number" id="cab_reserva" value="15" min="0" max="50"
+                      class="w-full bg-[#070d14] border border-brand-border rounded-lg px-2.5 py-1.5 text-xs text-white" />
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-300 mb-1" for="cab_modoPuxamento">Lances
+                    Simultâneos no Puxamento</label>
+                  <select id="cab_modoPuxamento"
+                    class="w-full bg-[#070d14] border border-brand-border rounded-lg px-2.5 py-1.5 text-xs text-slate-200">
+                    <option value="pura">Cálculo Estrito (Apenas Divisão Métrica)</option>
+                    <option value="2" selected>2 Cabos Simultâneos (Mínimo 2 Bobinas)</option>
+                    <option value="3">3 Cabos Simultâneos (Mínimo 3 Bobinas)</option>
+                    <option value="4">4 Cabos Simultâneos (Mínimo 4 Bobinas)</option>
+                  </select>
+                </div>
+              </div>
+            </details>
+
+            <!-- Acordeão: Rack, Switches e PDUs -->
+            <details class="acc_cab bg-brand-cardBg rounded-xl border border-brand-border overflow-hidden">
+              <summary
+                class="flex justify-between items-center px-4 py-3 cursor-pointer bg-[#0e1927] hover:bg-[#132233] transition font-bold text-xs text-slate-200 select-none">
+                <span>2. Rack, Switches & Energia Básica</span>
+                <span class="accordion-icon transition-transform duration-200 text-slate-400">▼</span>
+              </summary>
+              <div class="p-4 space-y-3 border-t border-brand-border bg-brand-cardBg">
+                <div class="grid grid-cols-2 gap-2">
+                  <div>
+                    <label class="block text-[11px] font-semibold text-slate-300 mb-1" for="cab_padraoPP">Densidade
+                      Patch Panel</label>
+                    <select id="cab_padraoPP"
+                      class="w-full bg-[#070d14] border border-brand-border rounded-lg px-2.5 py-1.5 text-xs text-slate-200">
+                      <option value="24" selected>24 Portas (1U)</option>
+                      <option value="48">48 Portas (2U)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-[11px] font-semibold text-slate-300 mb-1" for="cab_tipoPP">Tipo de Patch
+                      Panel</label>
+                    <select id="cab_tipoPP"
+                      class="w-full bg-[#070d14] border border-brand-border rounded-lg px-2.5 py-1.5 text-xs text-slate-200">
+                      <option value="modular" selected>Modular (Descarregado)</option>
+                      <option value="idc">Convencional (Bloco 110 IDC)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="bg-[#070d14] p-3 rounded-lg border border-brand-border space-y-2">
+                  <span class="text-[10px] font-bold text-brand-cyan uppercase tracking-wider block">Switches Centrais
+                    de Rack</span>
+                  <div class="grid grid-cols-3 gap-1.5">
+                    <div>
+                      <label class="block text-[10px] font-semibold text-slate-400 mb-0.5"
+                        for="cab_portasSwitch">Portas</label>
+                      <select id="cab_portasSwitch"
+                        class="w-full bg-[#0c1522] border border-brand-border rounded px-1.5 py-1 text-xs text-slate-200">
+                        <option value="8">8 Portas</option>
+                        <option value="16">16 Portas</option>
+                        <option value="24" selected>24 Portas</option>
+                        <option value="48">48 Portas</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label class="block text-[10px] font-semibold text-slate-400 mb-0.5"
+                        for="cab_velocidadeSwitch">Velocidade</label>
+                      <select id="cab_velocidadeSwitch"
+                        class="w-full bg-[#0c1522] border border-brand-border rounded px-1.5 py-1 text-xs text-slate-200">
+                        <option value="Gigabit" selected>Gigabit</option>
+                        <option value="Fast">Fast Ethernet</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label class="block text-[10px] font-semibold text-slate-400 mb-0.5"
+                        for="cab_gerenciamentoSwitch">Gestão</label>
+                      <select id="cab_gerenciamentoSwitch"
+                        class="w-full bg-[#0c1522] border border-brand-border rounded px-1.5 py-1 text-xs text-slate-200">
+                        <option value="Gerenciável" selected>Gerenciável</option>
+                        <option value="Não Gerenciável">Não Gerenc.</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </details>
+
+            <!-- Acordeão: Patch Cords & Consumíveis -->
+            <details class="acc_cab bg-brand-cardBg rounded-xl border border-brand-border overflow-hidden">
+              <summary
+                class="flex justify-between items-center px-4 py-3 cursor-pointer bg-[#0e1927] hover:bg-[#132233] transition font-bold text-xs text-slate-200 select-none">
+                <span>3. Patch Cords & Consumíveis</span>
+                <span class="accordion-icon transition-transform duration-200 text-slate-400">▼</span>
+              </summary>
+              <div class="p-4 space-y-3 border-t border-brand-border bg-brand-cardBg">
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-300 mb-1"
+                    for="cab_modoCalculoPC">Dimensionamento dos Patch Cords</label>
+                  <select id="cab_modoCalculoPC"
+                    class="w-full bg-[#070d14] border border-brand-border rounded-lg px-2.5 py-1.5 text-xs text-slate-200 font-bold">
+                    <option value="auto" selected>Automático (0,5m Rack + 2,5m Postos)</option>
+                  </select>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                  <label
+                    class="flex items-center gap-2 p-2 bg-[#070d14] border border-brand-border rounded-lg text-xs font-semibold text-slate-300 cursor-pointer">
+                    <input type="checkbox" id="cab_checkPCFabrica" checked
+                      class="rounded text-brand-cyan focus:ring-brand-cyan" />
+                    <span>Injetados de Fábrica</span>
+                  </label>
+                  <label
+                    class="flex items-center gap-2 p-2 bg-[#070d14] border border-brand-border rounded-lg text-xs font-semibold text-slate-300 cursor-pointer">
+                    <input type="checkbox" id="cab_checkPCManual"
+                      class="rounded text-brand-cyan focus:ring-brand-cyan" />
+                    <span>Montados em Campo</span>
+                  </label>
+                </div>
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-300 mb-1"
+                    for="cab_usarRotuladora">Identificação Técnica com Rotuladora</label>
+                  <select id="cab_usarRotuladora"
+                    class="w-full bg-[#070d14] border border-brand-border rounded-lg px-2.5 py-1.5 text-xs text-slate-200">
+                    <option value="sim" selected>Sim (Dimensionar Fitas Laminadas)</option>
+                    <option value="nao">Não Incluir Rotulagem</option>
+                  </select>
+                </div>
+              </div>
+            </details>
+
+            <button type="submit"
+              class="w-full bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-bold py-2.5 px-4 rounded-xl shadow-md transition flex items-center justify-center gap-2 cursor-pointer glow-cyan-sm">
+              Calcular Cabeamento Estruturado
+            </button>
+          </form>
+        </div>
+
+        <!-- Resultados e Resumo Módulo 1 -->
+        <div class="lg:col-span-7 space-y-4">
+          <!-- Cards de Resumo -->
+          <div class="bg-brand-cardBg border border-brand-border rounded-2xl p-4 shadow-sm">
+            <div class="flex justify-between items-center mb-3">
+              <h3 class="text-xs font-bold text-brand-cyan uppercase tracking-wider">Resumo Cabeamento & Infraestrutura
+              </h3>
+              <span id="cab_labelNomeProjeto"
+                class="text-xs font-semibold text-brand-sky truncate max-w-[220px]">-</span>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-center">
+              <div class="bg-[#070d14] p-2.5 rounded-xl border border-brand-border">
+                <span class="text-[10px] text-slate-400 block font-medium">Metragem Cabos</span>
+                <span id="cab_resumoMetros" class="text-base font-bold text-brand-cyan font-mono">-</span>
+              </div>
+              <div class="bg-[#070d14] p-2.5 rounded-xl border border-brand-border">
+                <span class="text-[10px] text-slate-400 block font-medium">Bobinas (305m)</span>
+                <span id="cab_resumoCaixas" class="text-base font-bold text-brand-cyan font-mono">-</span>
+              </div>
+              <div class="bg-[#070d14] p-2.5 rounded-xl border border-brand-border">
+                <span class="text-[10px] text-slate-400 block font-medium">Switches Rack</span>
+                <span id="cab_resumoSwitches" class="text-base font-bold text-brand-cyan font-mono">-</span>
+              </div>
+              <div class="bg-[#070d14] p-2.5 rounded-xl border border-brand-border">
+                <span class="text-[10px] text-slate-400 block font-medium">Rack Sugerido</span>
+                <span id="cab_resumoRack" class="text-base font-bold text-brand-cyan font-mono">-</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Alerta de Validação Térmica -->
+          <div id="cab_boxAlertaTermico"
+            class="hidden bg-amber-950/40 border border-amber-600/60 rounded-2xl p-4 shadow-sm flex items-start gap-3">
+            <div class="text-amber-400 bg-amber-900/60 p-2 rounded-xl text-lg leading-none shrink-0 font-bold">⚠️</div>
+            <div class="space-y-1">
+              <h4 class="text-xs font-bold text-amber-300 uppercase tracking-wider">Aviso de Dissipação Térmica e
+                Confinamento</h4>
+              <p id="cab_msgAlertaTermico" class="text-xs text-amber-200 leading-relaxed"></p>
+            </div>
+          </div>
+
+          <!-- Tabela de Materiais Módulo 1 -->
+          <div class="bg-brand-cardBg rounded-2xl shadow-sm border border-brand-border overflow-hidden">
+            <div class="px-4 py-3 border-b border-brand-border flex justify-between items-center bg-[#0a1420]">
+              <div>
+                <h3 class="font-bold text-white text-sm">Lista de Materiais - Cabeamento & Redes</h3>
+                <p class="text-[11px] text-slate-400">Memorial quantitativo físico e conectividade</p>
+              </div>
+              <button type="button" onclick="copiarTabelaModulo('cabeamento')"
+                class="text-[11px] bg-[#070d14] hover:bg-[#122234] text-brand-cyan border border-brand-border rounded px-2.5 py-1 transition">
+                Copiar Módulo
+              </button>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs text-slate-300">
+                <thead class="bg-[#070d14] text-slate-400 font-semibold border-b border-brand-border text-[11px]">
+                  <tr>
+                    <th class="py-2.5 px-3">Item / Descrição Técnica</th>
+                    <th class="py-2.5 px-3 w-28 text-center">Quantidade</th>
+                    <th class="py-2.5 px-3">Aplicação / Especificação</th>
+                  </tr>
+                </thead>
+                <tbody id="cab_tabelaMateriais" class="divide-y divide-brand-border/60">
+                  <tr>
+                    <td colspan="3" class="py-8 text-center text-slate-500">
+                      Preencha os dados e clique em "Calcular Cabeamento Estruturado".
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- MÓDULO 2: MONTAGEM DE RACK PARA CÂMERAS CFTV                             -->
+    <!-- ========================================================================= -->
+    <section id="modulo_cftv" class="modulo-view hidden">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+
+        <!-- Formulário Módulo 2 -->
+        <div class="no-print lg:col-span-5 space-y-3">
+          <div
+            class="flex justify-between items-center bg-brand-cardBg p-3 rounded-xl border border-brand-border shadow-sm">
+            <span class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+              <span class="text-brand-cyan">📹</span> Parâmetros do Sistema CFTV
+            </span>
+            <div class="flex gap-2">
+              <button type="button" onclick="alternarTodosAcordeoes(true, 'acc_cftv')"
+                class="text-[11px] font-semibold text-brand-cyan hover:text-cyan-300">Expandir</button>
+              <span class="text-slate-600">|</span>
+              <button type="button" onclick="alternarTodosAcordeoes(false, 'acc_cftv')"
+                class="text-[11px] font-semibold text-slate-400 hover:text-slate-200">Recolher</button>
+            </div>
+          </div>
+
+          <!-- CHECKBOX DE INTEGRAÇÃO COM OUTROS MÓDULOS -->
+          <div class="bg-cyan-950/30 border border-brand-cyan/40 rounded-xl p-3 shadow-sm">
+            <label class="flex items-start gap-2.5 cursor-pointer">
+              <input type="checkbox" id="cftv_integrarRackPrincipal" onchange="calcularModuloCFTV()" checked
+                class="mt-0.5 rounded text-brand-cyan focus:ring-brand-cyan" />
+              <div>
+                <span class="text-xs font-bold text-white block">Aproveitar Rack do Cabeamento Principal</span>
+                <span class="text-[11px] text-slate-300 block leading-tight">
+                  Se desmarcado, o sistema irá dimensionar um Mini-Rack exclusivo com chave para o CFTV (isolamento de
+                  segurança física).
+                </span>
+              </div>
+            </label>
+          </div>
+
+          <form id="formCFTV" onsubmit="event.preventDefault(); calcularModuloCFTV();" class="space-y-3">
+
+            <!-- 1. Quantitativo e Tipo de Câmeras -->
+            <details class="acc_cftv bg-brand-cardBg rounded-xl border border-brand-border overflow-hidden" open>
+              <summary
+                class="flex justify-between items-center px-4 py-3 cursor-pointer bg-[#0e1927] hover:bg-[#132233] transition font-bold text-xs text-slate-200 select-none">
+                <span>1. Quantidade, Tipo & Resolução das Câmeras</span>
+                <span class="accordion-icon transition-transform duration-200 text-slate-400">▼</span>
+              </summary>
+              <div class="p-4 space-y-3 border-t border-brand-border bg-brand-cardBg">
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="block text-xs font-bold text-slate-200 mb-1" for="cftv_qtdTotal">Total de
+                      Câmeras</label>
+                    <input type="number" id="cftv_qtdTotal" min="1" max="128" value="16" placeholder="Ex: 16"
+                      oninput="atualizarDistribuicaoCameras()"
+                      class="w-full bg-[#070d14] border border-cyan-500/40 rounded-lg px-3 py-2 text-brand-cyan font-bold text-lg font-mono focus:outline-none" />
+                  </div>
+                  <div>
+                    <label class="block text-xs font-bold text-slate-200 mb-1" for="cftv_tecnologia">Tecnologia</label>
+                    <select id="cftv_tecnologia" onchange="alternarTecnologiaCFTV()"
+                      class="w-full bg-[#070d14] border border-brand-border rounded-lg px-2.5 py-2 text-xs text-white">
+                      <option value="IP_POE" selected>IP PoE (802.3af/at Corporativo)</option>
+                      <option value="ANALOG_HD">Analógico HD (MHD / Baluns Passivos)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="bg-[#070d14] p-3 rounded-lg border border-brand-border space-y-2">
+                  <span class="text-[10px] font-bold text-brand-cyan uppercase tracking-wider block">Distribuição por
+                    Ambiente</span>
+                  <div class="grid grid-cols-2 gap-2">
+                    <div>
+                      <label class="block text-[11px] font-semibold text-slate-300 mb-1" for="cftv_qtdExternas">Externas
+                        (Bullet IP67 IR 30m+)</label>
+                      <input type="number" id="cftv_qtdExternas" min="0" value="10"
+                        class="w-full bg-[#0c1522] border border-brand-border rounded-lg px-2 py-1.5 text-xs text-white" />
+                    </div>
+                    <div>
+                      <label class="block text-[11px] font-semibold text-slate-300 mb-1" for="cftv_qtdInternas">Internas
+                        (Dome Anti-vandalismo)</label>
+                      <input type="number" id="cftv_qtdInternas" min="0" value="6"
+                        class="w-full bg-[#0c1522] border border-brand-border rounded-lg px-2 py-1.5 text-xs text-white" />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                  <div>
+                    <label class="block text-[11px] font-semibold text-slate-300 mb-1" for="cftv_resolucao">Resolução
+                      das Imagens</label>
+                    <select id="cftv_resolucao"
+                      class="w-full bg-[#070d14] border border-brand-border rounded-lg px-2.5 py-1.5 text-xs text-white">
+                      <option value="2MP" selected>Full HD 2MP (1080p - 2 Mbps)</option>
+                      <option value="4MP">Quad HD 4MP (2K - 4 Mbps)</option>
+                      <option value="8MP">Ultra HD 8MP (4K - 8 Mbps)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-[11px] font-semibold text-slate-300 mb-1" for="cftv_retencaoDias">Retenção
+                      de Gravação</label>
+                    <select id="cftv_retencaoDias"
+                      class="w-full bg-[#070d14] border border-brand-border rounded-lg px-2.5 py-1.5 text-xs text-white">
+                      <option value="15">15 Dias de Armazenamento</option>
+                      <option value="30" selected>30 Dias de Armazenamento</option>
+                      <option value="60">60 Dias de Armazenamento</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-300 mb-1" for="cftv_distanciaMedia">Distância
+                    Média por Câmera (m)</label>
+                  <input type="number" id="cftv_distanciaMedia" min="10" value="45"
+                    class="w-full bg-[#070d14] border border-brand-border rounded-lg px-2.5 py-1.5 text-xs text-white" />
+                </div>
+              </div>
+            </details>
+
+            <button type="submit"
+              class="w-full bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-bold py-2.5 px-4 rounded-xl shadow-md transition flex items-center justify-center gap-2 cursor-pointer glow-cyan-sm">
+              Calcular Sistema CFTV
+            </button>
+          </form>
+        </div>
+
+        <!-- Resultados e Resumo Módulo 2 -->
+        <div class="lg:col-span-7 space-y-4">
+          <!-- Cards de Resumo CFTV -->
+          <div class="bg-brand-cardBg border border-brand-border rounded-2xl p-4 shadow-sm">
+            <div class="flex justify-between items-center mb-3">
+              <h3 class="text-xs font-bold text-brand-cyan uppercase tracking-wider">Resumo do Sistema de Vigilância
+                CFTV</h3>
+              <span id="cftv_labelTecnologia" class="text-xs font-semibold text-brand-sky">IP PoE 802.3af</span>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-center">
+              <div class="bg-[#070d14] p-2.5 rounded-xl border border-brand-border">
+                <span class="text-[10px] text-slate-400 block font-medium">Gravador Recomendado</span>
+                <span id="cftv_resumoNVR" class="text-sm font-bold text-brand-cyan font-mono">-</span>
+              </div>
+              <div class="bg-[#070d14] p-2.5 rounded-xl border border-brand-border">
+                <span class="text-[10px] text-slate-400 block font-medium">Storage Necessário</span>
+                <span id="cftv_resumoHD" class="text-base font-bold text-brand-cyan font-mono">-</span>
+              </div>
+              <div class="bg-[#070d14] p-2.5 rounded-xl border border-brand-border">
+                <span class="text-[10px] text-slate-400 block font-medium">Switch / Fonte</span>
+                <span id="cftv_resumoSwitch" class="text-sm font-bold text-brand-cyan font-mono">-</span>
+              </div>
+              <div class="bg-[#070d14] p-2.5 rounded-xl border border-brand-border">
+                <span class="text-[10px] text-slate-400 block font-medium">Rack CFTV</span>
+                <span id="cftv_resumoRack" class="text-base font-bold text-brand-cyan font-mono">-</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tabela de Materiais Módulo 2 -->
+          <div class="bg-brand-cardBg rounded-2xl shadow-sm border border-brand-border overflow-hidden">
+            <div class="px-4 py-3 border-b border-brand-border flex justify-between items-center bg-[#0a1420]">
+              <div>
+                <h3 class="font-bold text-white text-sm">Lista de Materiais - Rack & Câmeras CFTV</h3>
+                <p class="text-[11px] text-slate-400">Gravador NVR/DVR, discos Western Digital Purple, infraestrutura e
+                  conectividade</p>
+              </div>
+              <button type="button" onclick="copiarTabelaModulo('cftv')"
+                class="text-[11px] bg-[#070d14] hover:bg-[#122234] text-brand-cyan border border-brand-border rounded px-2.5 py-1 transition">
+                Copiar Módulo
+              </button>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs text-slate-300">
+                <thead class="bg-[#070d14] text-slate-400 font-semibold border-b border-brand-border text-[11px]">
+                  <tr>
+                    <th class="py-2.5 px-3">Item / Descrição Técnica</th>
+                    <th class="py-2.5 px-3 w-28 text-center">Quantidade</th>
+                    <th class="py-2.5 px-3">Aplicação / Especificação</th>
+                  </tr>
+                </thead>
+                <tbody id="cftv_tabelaMateriais" class="divide-y divide-brand-border/60">
+                  <tr>
+                    <td colspan="3" class="py-8 text-center text-slate-500">
+                      Preencha os dados e clique em "Calcular Sistema CFTV".
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- MÓDULO 3: ENERGIA, NOBREAKS & PROTEÇÃO CLAMPER                            -->
+    <!-- ========================================================================= -->
+    <section id="modulo_energia" class="modulo-view hidden">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+
+        <!-- Formulário Módulo 3 -->
+        <div class="no-print lg:col-span-5 space-y-3">
+          <div
+            class="flex justify-between items-center bg-brand-cardBg p-3 rounded-xl border border-brand-border shadow-sm">
+            <span class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+              <span class="text-brand-cyan">⚡</span> Estimativa Energética & Nobreak
+            </span>
+            <div class="flex gap-2">
+              <button type="button" onclick="alternarTodosAcordeoes(true, 'acc_nrg')"
+                class="text-[11px] font-semibold text-brand-cyan hover:text-cyan-300">Expandir</button>
+              <span class="text-slate-600">|</span>
+              <button type="button" onclick="alternarTodosAcordeoes(false, 'acc_nrg')"
+                class="text-[11px] font-semibold text-slate-400 hover:text-slate-200">Recolher</button>
+            </div>
+          </div>
+
+          <!-- CHECKBOXES DE INTEGRAÇÃO COM OUTROS MÓDULOS -->
+          <div class="bg-cyan-950/30 border border-brand-cyan/40 rounded-xl p-3 shadow-sm space-y-2">
+            <span class="text-[10px] font-bold text-brand-cyan uppercase tracking-wider block">🔗 Importação de Cargas
+              de Outros Módulos</span>
+
+            <label class="flex items-start gap-2.5 cursor-pointer">
+              <input type="checkbox" id="nrg_importarCabeamento" onchange="calcularModuloEnergia()" checked
+                class="mt-0.5 rounded text-brand-cyan focus:ring-brand-cyan" />
+              <div>
+                <span class="text-xs font-bold text-white block">Importar Cargas do Cabeamento Estruturado</span>
+                <span class="text-[10px] text-slate-400 block" id="nrg_descCargaCab">Calcula switches, roteadores e APs
+                  existentes</span>
+              </div>
+            </label>
+
+            <label class="flex items-start gap-2.5 cursor-pointer">
+              <input type="checkbox" id="nrg_importarCFTV" onchange="calcularModuloEnergia()" checked
+                class="mt-0.5 rounded text-brand-cyan focus:ring-brand-cyan" />
+              <div>
+                <span class="text-xs font-bold text-white block">Importar Cargas do Módulo de CFTV</span>
+                <span class="text-[10px] text-slate-400 block" id="nrg_descCargaCFTV">Calcula NVR/DVR, HDs e câmeras
+                  PoE/fontes 12V</span>
+              </div>
+            </label>
+          </div>
+
+          <form id="formEnergia" onsubmit="event.preventDefault(); calcularModuloEnergia();" class="space-y-3">
+
+            <!-- 1. Cargas Adicionais e Tensão -->
+            <details class="acc_nrg bg-brand-cardBg rounded-xl border border-brand-border overflow-hidden" open>
+              <summary
+                class="flex justify-between items-center px-4 py-3 cursor-pointer bg-[#0e1927] hover:bg-[#132233] transition font-bold text-xs text-slate-200 select-none">
+                <span>1. Cargas Adicionais & Parâmetros Elétricos</span>
+                <span class="accordion-icon transition-transform duration-200 text-slate-400">▼</span>
+              </summary>
+              <div class="p-4 space-y-3 border-t border-brand-border bg-brand-cardBg">
+                <div class="grid grid-cols-2 gap-2">
+                  <div>
+                    <label class="block text-[11px] font-semibold text-slate-300 mb-1" for="nrg_tensaoEntrada">Tensão da
+                      Rede Local</label>
+                    <select id="nrg_tensaoEntrada"
+                      class="w-full bg-[#070d14] border border-brand-border rounded-lg px-2.5 py-1.5 text-xs text-white">
+                      <option value="Bivolt" selected>Bivolt Automático (115V/220V)</option>
+                      <option value="220V">220V Monofásico</option>
+                      <option value="127V">127V (110V Monofásico)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-[11px] font-semibold text-slate-300 mb-1" for="nrg_autonomia">Autonomia
+                      Desejada</label>
+                    <select id="nrg_autonomia"
+                      class="w-full bg-[#070d14] border border-brand-border rounded-lg px-2.5 py-1.5 text-xs text-white">
+                      <option value="15">15 minutos (Padrão para salvar e desligar)</option>
+                      <option value="30" selected>30 minutos (Corporativo intermediário)</option>
+                      <option value="60">1 Hora (Expansão c/ Banco de Baterias)</option>
+                      <option value="120">2 Horas (Operação Crítica Ininterrupta)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="bg-[#070d14] p-3 rounded-lg border border-brand-border space-y-2">
+                  <span class="text-[10px] font-bold text-brand-cyan uppercase tracking-wider block">Equipamentos Extras
+                    no Rack</span>
+                  <div class="grid grid-cols-2 gap-2">
+                    <div>
+                      <label class="block text-[10px] font-semibold text-slate-400 mb-0.5"
+                        for="nrg_qtdServidores">Servidores de Rack (250W un)</label>
+                      <input type="number" id="nrg_qtdServidores" min="0" value="0"
+                        class="w-full bg-[#0c1522] border border-brand-border rounded px-2 py-1 text-xs text-white" />
+                    </div>
+                    <div>
+                      <label class="block text-[10px] font-semibold text-slate-400 mb-0.5"
+                        for="nrg_qtdStorages">Storages NAS (120W un)</label>
+                      <input type="number" id="nrg_qtdStorages" min="0" value="0"
+                        class="w-full bg-[#0c1522] border border-brand-border rounded px-2 py-1 text-xs text-white" />
+                    </div>
+                  </div>
+                  <div>
+                    <label class="block text-[10px] font-semibold text-slate-400 mb-0.5"
+                      for="nrg_cargasExtrasWatts">Outras Cargas Manuais (Watts)</label>
+                    <input type="number" id="nrg_cargasExtrasWatts" min="0" value="50"
+                      placeholder="Ex: 50W (modem, coolers, iluminação)"
+                      class="w-full bg-[#0c1522] border border-brand-border rounded px-2 py-1 text-xs text-white" />
+                  </div>
+                </div>
+
+                <div class="space-y-2">
+                  <span class="text-[11px] font-bold text-slate-300 block">Topologia & Proteção Clamper</span>
+                  <div class="grid grid-cols-1 gap-1.5 text-xs">
+                    <label
+                      class="flex items-center gap-2 p-2 bg-[#070d14] border border-brand-border rounded-lg text-slate-300 cursor-pointer">
+                      <input type="checkbox" id="nrg_checkSenoidal" checked disabled class="rounded text-brand-cyan" />
+                      <span><strong>Nobreak Senoidal Puro</strong> (Obrigatório p/ fontes PFC e telecom)</span>
+                    </label>
+                    <label
+                      class="flex items-center gap-2 p-2 bg-[#070d14] border border-brand-border rounded-lg text-slate-300 cursor-pointer">
+                      <input type="checkbox" id="nrg_checkDPSClamper" checked
+                        class="rounded text-brand-cyan focus:ring-brand-cyan" />
+                      <span><strong>DPS CLAMPER Classe II</strong> (Proteção contra raios no quadro/rack)</span>
+                    </label>
+                    <label
+                      class="flex items-center gap-2 p-2 bg-[#070d14] border border-brand-border rounded-lg text-slate-300 cursor-pointer">
+                      <input type="checkbox" id="nrg_checkDPSRede" checked
+                        class="rounded text-brand-cyan focus:ring-brand-cyan" />
+                      <span><strong>DPS Clamper RJ45 PoE</strong> (Proteção de cabos de rede externos)</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </details>
+
+            <button type="submit"
+              class="w-full bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-bold py-2.5 px-4 rounded-xl shadow-md transition flex items-center justify-center gap-2 cursor-pointer glow-cyan-sm">
+              Calcular Sistema de Energia & Nobreak
+            </button>
+          </form>
+        </div>
+
+        <!-- Resultados e Resumo Módulo 3 -->
+        <div class="lg:col-span-7 space-y-4">
+          <!-- Cards de Resumo Energia -->
+          <div class="bg-brand-cardBg border border-brand-border rounded-2xl p-4 shadow-sm">
+            <div class="flex justify-between items-center mb-3">
+              <h3 class="text-xs font-bold text-brand-cyan uppercase tracking-wider">Dimensionamento Elétrico &
+                Autonomia</h3>
+              <span id="nrg_labelTopologia" class="text-xs font-semibold text-brand-sky">Senoidal Puro Dupla
+                Conversão</span>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-center">
+              <div class="bg-[#070d14] p-2.5 rounded-xl border border-brand-border">
+                <span class="text-[10px] text-slate-400 block font-medium">Potência Real (Watts)</span>
+                <span id="nrg_resumoWatts" class="text-base font-bold text-brand-cyan font-mono">-</span>
+              </div>
+              <div class="bg-[#070d14] p-2.5 rounded-xl border border-brand-border">
+                <span class="text-[10px] text-slate-400 block font-medium">Potência Mínima (VA)</span>
+                <span id="nrg_resumoVA" class="text-base font-bold text-brand-cyan font-mono">-</span>
+              </div>
+              <div class="bg-[#070d14] p-2.5 rounded-xl border border-brand-border">
+                <span class="text-[10px] text-slate-400 block font-medium">Nobreak Sugerido</span>
+                <span id="nrg_resumoNobreak" class="text-sm font-bold text-brand-cyan font-mono">-</span>
+              </div>
+              <div class="bg-[#070d14] p-2.5 rounded-xl border border-brand-border">
+                <span class="text-[10px] text-slate-400 block font-medium">Módulo Baterias</span>
+                <span id="nrg_resumoBateria" class="text-xs font-bold text-brand-cyan font-mono">-</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tabela de Materiais Módulo 3 -->
+          <div class="bg-brand-cardBg rounded-2xl shadow-sm border border-brand-border overflow-hidden">
+            <div class="px-4 py-3 border-b border-brand-border flex justify-between items-center bg-[#0a1420]">
+              <div>
+                <h3 class="font-bold text-white text-sm">Lista de Materiais - Energia, Nobreaks & DPS</h3>
+                <p class="text-[11px] text-slate-400">Nobreaks senoidais, baterias estacionárias, protetores CLAMPER e
+                  aterramento NBR 5410</p>
+              </div>
+              <button type="button" onclick="copiarTabelaModulo('energia')"
+                class="text-[11px] bg-[#070d14] hover:bg-[#122234] text-brand-cyan border border-brand-border rounded px-2.5 py-1 transition">
+                Copiar Módulo
+              </button>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs text-slate-300">
+                <thead class="bg-[#070d14] text-slate-400 font-semibold border-b border-brand-border text-[11px]">
+                  <tr>
+                    <th class="py-2.5 px-3">Item / Descrição Técnica</th>
+                    <th class="py-2.5 px-3 w-28 text-center">Quantidade</th>
+                    <th class="py-2.5 px-3">Aplicação / Especificação</th>
+                  </tr>
+                </thead>
+                <tbody id="nrg_tabelaMateriais" class="divide-y divide-brand-border/60">
+                  <tr>
+                    <td colspan="3" class="py-8 text-center text-slate-500">
+                      Preencha os dados e clique em "Calcular Sistema de Energia & Nobreak".
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- MÓDULO 4: AMPLIAÇÃO DA REDE WI-FI CORPORATIVO                             -->
+    <!-- ========================================================================= -->
+    <section id="modulo_wifi" class="modulo-view hidden">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+
+        <!-- Formulário Módulo 4 -->
+        <div class="no-print lg:col-span-5 space-y-3">
+          <div
+            class="flex justify-between items-center bg-brand-cardBg p-3 rounded-xl border border-brand-border shadow-sm">
+            <span class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+              <span class="text-brand-cyan">📶</span> Parâmetros de Expansão Wi-Fi
+            </span>
+            <div class="flex gap-2">
+              <button type="button" onclick="alternarTodosAcordeoes(true, 'acc_wifi')"
+                class="text-[11px] font-semibold text-brand-cyan hover:text-cyan-300">Expandir</button>
+              <span class="text-slate-600">|</span>
+              <button type="button" onclick="alternarTodosAcordeoes(false, 'acc_wifi')"
+                class="text-[11px] font-semibold text-slate-400 hover:text-slate-200">Recolher</button>
+            </div>
+          </div>
+
+          <!-- CHECKBOX DE INTEGRAÇÃO COM CABEAMENTO -->
+          <div class="bg-cyan-950/30 border border-brand-cyan/40 rounded-xl p-3 shadow-sm">
+            <label class="flex items-start gap-2.5 cursor-pointer">
+              <input type="checkbox" id="wifi_integrarCabeamento" onchange="calcularModuloWiFi()" checked
+                class="mt-0.5 rounded text-brand-cyan focus:ring-brand-cyan" />
+              <div>
+                <span class="text-xs font-bold text-white block">Vincular Cabos de Teto ao Cabeamento Principal</span>
+                <span class="text-[11px] text-slate-300 block leading-tight">
+                  Integra as bobinas de cabo Cat6 e patch panels do rack central para atender os novos pontos de Wi-Fi
+                  corporativo.
+                </span>
+              </div>
+            </label>
+          </div>
+
+          <form id="formWiFi" onsubmit="event.preventDefault(); calcularModuloWiFi();" class="space-y-3">
+
+            <!-- 1. Perfil e Quantidade de APs -->
+            <details class="acc_wifi bg-brand-cardBg rounded-xl border border-brand-border overflow-hidden" open>
+              <summary
+                class="flex justify-between items-center px-4 py-3 cursor-pointer bg-[#0e1927] hover:bg-[#132233] transition font-bold text-xs text-slate-200 select-none">
+                <span>1. Ambiente, Padrão Wi-Fi & Quantidade</span>
+                <span class="accordion-icon transition-transform duration-200 text-slate-400">▼</span>
+              </summary>
+              <div class="p-4 space-y-3 border-t border-brand-border bg-brand-cardBg">
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-300 mb-1" for="wifi_perfilAmbiente">Perfil do
+                    Ambiente</label>
+                  <select id="wifi_perfilAmbiente" onchange="atualizarSugeridoWiFi()"
+                    class="w-full bg-[#070d14] border border-brand-border rounded-lg px-2.5 py-1.5 text-xs text-white">
+                    <option value="escritorio" selected>Escritório Corporativo (Densidade Média, 1 AP p/ 80-120 m²)
+                    </option>
+                    <option value="alta_densidade">Alta Densidade / Auditório / Eventos (80+ dispositivos por AP)
+                    </option>
+                    <option value="galpao">Galpão Logístico / Indústria (Pé-direito alto, longo alcance)</option>
+                    <option value="outdoor">Área Aberta / Pátio Externo (Grau de proteção IP67)</option>
+                  </select>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                  <div>
+                    <label class="block text-xs font-bold text-slate-200 mb-1" for="wifi_qtdAPs">Qtd de Access Points
+                      (APs)</label>
+                    <input type="number" id="wifi_qtdAPs" min="1" max="64" value="6" placeholder="Ex: 6"
+                      class="w-full bg-[#070d14] border border-cyan-500/40 rounded-lg px-3 py-2 text-brand-cyan font-bold text-lg font-mono focus:outline-none" />
+                  </div>
+                  <div>
+                    <label class="block text-xs font-bold text-slate-200 mb-1" for="wifi_padrao">Geração
+                      Tecnológica</label>
+                    <select id="wifi_padrao"
+                      class="w-full bg-[#070d14] border border-brand-border rounded-lg px-2.5 py-2 text-xs text-white">
+                      <option value="WiFi6" selected>Wi-Fi 6 (802.11ax - Padrão Atual)</option>
+                      <option value="WiFi6E_7">Wi-Fi 6E / Wi-Fi 7 (Multi-Gigabit 6GHz)</option>
+                      <option value="WiFi5">Wi-Fi 5 (802.11ac Wave 2 - Econômico)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                  <div>
+                    <label class="block text-[11px] font-semibold text-slate-300 mb-1" for="wifi_gestao">Gestão /
+                      Controladora</label>
+                    <select id="wifi_gestao"
+                      class="w-full bg-[#070d14] border border-brand-border rounded-lg px-2.5 py-1.5 text-xs text-white">
+                      <option value="cloud" selected>Nuvem (Cloud Controller / Sem hardware)</option>
+                      <option value="appliance">Appliance Físico no Rack (1U)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-[11px] font-semibold text-slate-300 mb-1"
+                      for="wifi_alimentacao">Alimentação Elétrica</label>
+                    <select id="wifi_alimentacao"
+                      class="w-full bg-[#070d14] border border-brand-border rounded-lg px-2.5 py-1.5 text-xs text-white">
+                      <option value="switch_poe" selected>Switch PoE+ 802.3at Corporativo</option>
+                      <option value="injetor_poe">Injetores PoE Gigabit Individuais</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-300 mb-1" for="wifi_tipoInstalacao">Montagem
+                    Física dos APs</label>
+                  <select id="wifi_tipoInstalacao"
+                    class="w-full bg-[#070d14] border border-brand-border rounded-lg px-2.5 py-1.5 text-xs text-white">
+                    <option value="teto" selected>Teto com Suporte Perfil T / Forro Gesso</option>
+                    <option value="parede">Parede / Posto In-Wall</option>
+                    <option value="mastro">Mastro Metálico / Suporte Articulado Outdoor</option>
+                  </select>
+                </div>
+              </div>
+            </details>
+
+            <button type="submit"
+              class="w-full bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-bold py-2.5 px-4 rounded-xl shadow-md transition flex items-center justify-center gap-2 cursor-pointer glow-cyan-sm">
+              Calcular Expansão Wi-Fi
+            </button>
+          </form>
+        </div>
+
+        <!-- Resultados e Resumo Módulo 4 -->
+        <div class="lg:col-span-7 space-y-4">
+          <!-- Cards de Resumo Wi-Fi -->
+          <div class="bg-brand-cardBg border border-brand-border rounded-2xl p-4 shadow-sm">
+            <div class="flex justify-between items-center mb-3">
+              <h3 class="text-xs font-bold text-brand-cyan uppercase tracking-wider">Resumo da Expansão Wi-Fi
+                Corporativa</h3>
+              <span id="wifi_labelPerfil" class="text-xs font-semibold text-brand-sky">Wi-Fi 6 Corporativo</span>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-center">
+              <div class="bg-[#070d14] p-2.5 rounded-xl border border-brand-border">
+                <span class="text-[10px] text-slate-400 block font-medium">Access Points</span>
+                <span id="wifi_resumoAPs" class="text-base font-bold text-brand-cyan font-mono">-</span>
+              </div>
+              <div class="bg-[#070d14] p-2.5 rounded-xl border border-brand-border">
+                <span class="text-[10px] text-slate-400 block font-medium">Switch / Injetores</span>
+                <span id="wifi_resumoSwitch" class="text-sm font-bold text-brand-cyan font-mono">-</span>
+              </div>
+              <div class="bg-[#070d14] p-2.5 rounded-xl border border-brand-border">
+                <span class="text-[10px] text-slate-400 block font-medium">Controladora</span>
+                <span id="wifi_resumoGestao" class="text-xs font-bold text-brand-cyan font-mono">-</span>
+              </div>
+              <div class="bg-[#070d14] p-2.5 rounded-xl border border-brand-border">
+                <span class="text-[10px] text-slate-400 block font-medium">PoE Budget Est.</span>
+                <span id="wifi_resumoPoEWatts" class="text-base font-bold text-brand-cyan font-mono">-</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tabela de Materiais Módulo 4 -->
+          <div class="bg-brand-cardBg rounded-2xl shadow-sm border border-brand-border overflow-hidden">
+            <div class="px-4 py-3 border-b border-brand-border flex justify-between items-center bg-[#0a1420]">
+              <div>
+                <h3 class="font-bold text-white text-sm">Lista de Materiais - Expansão Wi-Fi</h3>
+                <p class="text-[11px] text-slate-400">Access Points corporativos, switches PoE+, cabos de teto e
+                  acessórios de fixação</p>
+              </div>
+              <button type="button" onclick="copiarTabelaModulo('wifi')"
+                class="text-[11px] bg-[#070d14] hover:bg-[#122234] text-brand-cyan border border-brand-border rounded px-2.5 py-1 transition">
+                Copiar Módulo
+              </button>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs text-slate-300">
+                <thead class="bg-[#070d14] text-slate-400 font-semibold border-b border-brand-border text-[11px]">
+                  <tr>
+                    <th class="py-2.5 px-3">Item / Descrição Técnica</th>
+                    <th class="py-2.5 px-3 w-28 text-center">Quantidade</th>
+                    <th class="py-2.5 px-3">Aplicação / Especificação</th>
+                  </tr>
+                </thead>
+                <tbody id="wifi_tabelaMateriais" class="divide-y divide-brand-border/60">
+                  <tr>
+                    <td colspan="3" class="py-8 text-center text-slate-500">
+                      Preencha os dados e clique em "Calcular Expansão Wi-Fi".
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- MÓDULO 5: LAUDO CONSOLIDADO (UNIFICADO)                                  -->
+    <!-- ========================================================================= -->
+    <section id="modulo_consolidado" class="modulo-view hidden">
+      <div class="space-y-4">
+
+        <!-- BARRA DE SELEÇÃO DOS MÓDULOS NO LAUDO -->
+        <div
+          class="no-print bg-brand-cardBg border border-brand-border rounded-xl p-4 shadow-md flex flex-wrap justify-between items-center gap-3">
+          <div>
+            <h3 class="font-bold text-white text-sm flex items-center gap-2">
+              <span class="text-brand-cyan">📑</span> Laudo Técnico Integrado & Memorial Consolidado
+            </h3>
+            <p class="text-xs text-slate-400">Selecione quais disciplinas técnicas deseja incluir no laudo final para
+              emissão e compras:</p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-3 text-xs">
+            <label
+              class="flex items-center gap-1.5 cursor-pointer bg-[#070d14] px-2.5 py-1.5 rounded-lg border border-brand-border hover:border-brand-cyan">
+              <input type="checkbox" id="chkConsol_cab" onchange="renderizarLaudoConsolidado()" checked
+                class="rounded text-brand-cyan focus:ring-brand-cyan" />
+              <span>🌐 Cabeamento</span>
+            </label>
+            <label
+              class="flex items-center gap-1.5 cursor-pointer bg-[#070d14] px-2.5 py-1.5 rounded-lg border border-brand-border hover:border-brand-cyan">
+              <input type="checkbox" id="chkConsol_cftv" onchange="renderizarLaudoConsolidado()" checked
+                class="rounded text-brand-cyan focus:ring-brand-cyan" />
+              <span>📹 CFTV</span>
+            </label>
+            <label
+              class="flex items-center gap-1.5 cursor-pointer bg-[#070d14] px-2.5 py-1.5 rounded-lg border border-brand-border hover:border-brand-cyan">
+              <input type="checkbox" id="chkConsol_energia" onchange="renderizarLaudoConsolidado()" checked
+                class="rounded text-brand-cyan focus:ring-brand-cyan" />
+              <span>⚡ Energia</span>
+            </label>
+            <label
+              class="flex items-center gap-1.5 cursor-pointer bg-[#070d14] px-2.5 py-1.5 rounded-lg border border-brand-border hover:border-brand-cyan">
+              <input type="checkbox" id="chkConsol_wifi" onchange="renderizarLaudoConsolidado()" checked
+                class="rounded text-brand-cyan focus:ring-brand-cyan" />
+              <span>📶 Wi-Fi</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- QUADRO DE RESUMO GERAL DAS 4 DISCIPLINAS -->
+        <div class="bg-brand-cardBg border border-brand-border rounded-2xl p-4 shadow-sm break-inside-avoid">
+          <div class="flex justify-between items-center mb-3">
+            <h3 class="text-xs font-bold text-brand-cyan uppercase tracking-wider">Métricas Globais da Infraestrutura
+            </h3>
+            <span id="consol_labelProjeto" class="text-xs font-semibold text-brand-sky font-mono">-</span>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+            <div class="bg-[#070d14] p-3 rounded-xl border border-brand-border">
+              <span class="text-[10px] text-slate-400 block font-medium">Pontos / Ativos Totais</span>
+              <span id="consol_resumoPontos" class="text-lg font-bold text-brand-cyan font-mono">-</span>
+            </div>
+            <div class="bg-[#070d14] p-3 rounded-xl border border-brand-border">
+              <span class="text-[10px] text-slate-400 block font-medium">Cabo UTP Total</span>
+              <span id="consol_resumoMetros" class="text-lg font-bold text-brand-cyan font-mono">-</span>
+            </div>
+            <div class="bg-[#070d14] p-3 rounded-xl border border-brand-border">
+              <span class="text-[10px] text-slate-400 block font-medium">Demanda Elétrica</span>
+              <span id="consol_resumoCarga" class="text-lg font-bold text-brand-cyan font-mono">-</span>
+            </div>
+            <div class="bg-[#070d14] p-3 rounded-xl border border-brand-border">
+              <span class="text-[10px] text-slate-400 block font-medium">Gabinete / Racks</span>
+              <span id="consol_resumoRacks" class="text-lg font-bold text-brand-cyan font-mono">-</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- TABELA CONSOLIDADA DE MATERIAIS -->
+        <div
+          class="bg-brand-cardBg rounded-2xl shadow-sm border border-brand-border overflow-hidden break-inside-avoid">
+          <div
+            class="px-4 py-3 border-b border-brand-border flex flex-wrap justify-between items-center gap-2 bg-[#0a1420]">
+            <div>
+              <h3 class="font-bold text-white text-sm">Memorial Descritivo Unificado de Materiais</h3>
+              <p class="text-[11px] text-slate-400">Consolidação de compras para orçamento e execução técnica</p>
+            </div>
+            <span id="consol_totalItensBadge"
+              class="text-xs font-semibold text-brand-cyan bg-cyan-950/60 border border-cyan-800/60 px-2.5 py-1 rounded-lg">
+              0 itens listados
+            </span>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs text-slate-300">
+              <thead class="bg-[#070d14] text-slate-400 font-semibold border-b border-brand-border text-[11px]">
+                <tr>
+                  <th class="py-2.5 px-3">Disciplina / Item Técnico</th>
+                  <th class="py-2.5 px-3 w-28 text-center">Quantidade</th>
+                  <th class="py-2.5 px-3">Aplicação / Especificação</th>
+                </tr>
+              </thead>
+              <tbody id="tabelaConsolidadaMateriais" class="divide-y divide-brand-border/60">
+                <!-- Preenchido via JavaScript -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- BOTÕES DE AÇÃO DO LAUDO CONSOLIDADO -->
+          <div class="no-print p-3 bg-[#09121d] border-t border-brand-border flex flex-wrap gap-2 justify-end">
+            <button type="button" onclick="exportarCSVConsolidado()"
+              class="px-3 py-1.5 bg-[#0e1a28] hover:bg-[#14263b] border border-brand-border text-slate-200 rounded-lg text-xs font-semibold shadow-sm transition flex items-center gap-1 cursor-pointer">
+              <svg class="w-3.5 h-3.5 text-brand-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              Exportar CSV
+            </button>
+            <button type="button" onclick="compartilharWhatsAppConsolidado()"
+              class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-semibold shadow-sm transition flex items-center gap-1 cursor-pointer">
+              <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                <path
+                  d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z" />
+              </svg>
+              WhatsApp
+            </button>
+            <button type="button" onclick="copiarListaConsolidada()"
+              class="px-3 py-1.5 bg-[#0e1a28] hover:bg-[#14263b] border border-brand-border text-slate-200 rounded-lg text-xs font-semibold shadow-sm transition flex items-center gap-1 cursor-pointer">
+              <svg class="w-3.5 h-3.5 text-brand-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+              </svg>
+              Copiar Lista
+            </button>
+            <button type="button" onclick="prepararEImprimirLaudo()"
+              class="px-4 py-1.5 bg-brand-cyan hover:bg-cyan-400 text-slate-950 rounded-lg text-xs font-bold shadow-md transition flex items-center gap-1.5 cursor-pointer glow-cyan-sm">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+              </svg>
+              Imprimir Laudo ABNT / PDF
+            </button>
+          </div>
+        </div>
+
+        <!-- TERMO DE RESPONSABILIDADE TÉCNICA E ASSINATURAS (PRINT ONLY) -->
+        <section class="print-only mt-8 space-y-6 break-inside-avoid">
+          <div class="p-3 bg-slate-50 border border-slate-300 rounded text-[9.5px] text-slate-700 leading-relaxed">
+            <p class="font-bold text-slate-900 mb-1 uppercase tracking-wider">Declaração de Responsabilidade Técnica e
+              Conformidade Normativa</p>
+            <p>
+              O presente Laudo Técnico consolida o dimensionamento físico, elétrico e funcional estrito de materiais
+              para infraestrutura de telecomunicações, cabeamento estruturado, sistema de circuito fechado de televisão
+              (CFTV), proteção e condicionamento de energia ininterrupta e rede de dados corporativa sem fio. As
+              especificações seguem rigorosamente as boas práticas das normas <strong>ABNT NBR 14565</strong>
+              (Cabeamento Estruturado para Edifícios Comerciais), <strong>ANSI/TIA-568</strong>, <strong>ABNT NBR
+                5410</strong> (Instalações Elétricas de Baixa Tensão e Proteção contra Surtos) e <strong>NBR
+                5419</strong>. Quaisquer desvios de rota, interferências estruturais ou aditivos de escopo exigirão
+              revisão técnica deste memorial.
+            </p>
+          </div>
+          <div class="grid grid-cols-2 gap-8 pt-8 text-center text-[10.5px] text-slate-800">
+            <div>
+              <div class="border-t border-slate-800 pt-1.5 font-bold" id="printAssinaturaTecnico"></div>
+              <p class="text-[9.5px] text-slate-600">Responsável Técnico pelo Levantamento</p>
+            </div>
+            <div>
+              <div class="border-t border-slate-800 pt-1.5 font-bold" id="printAssinaturaCliente"></div>
+              <p class="text-[9.5px] text-slate-600">Ciência e Aprovação do Cliente / Contratante</p>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========================================== -->
+  <!-- RODAPÉ DA APLICAÇÃO                        -->
+  <!-- ========================================== -->
+  <footer class="no-print bg-[#0a121c] border-t border-brand-border py-3 text-center text-xs text-brand-teal mt-6">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-2">
+      <div class="flex items-center gap-2">
+        <span class="font-bold text-slate-300">InfraSpec v3.0</span>
+        <span>•</span>
+        <span>Engenharia de Infraestrutura e Redes</span>
+      </div>
+      <div>
+        <span>Execução 100% Client-Side & LocalStorage</span>
+        <span>•</span>
+        <span class="text-brand-cyan">Alta Disponibilidade</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL: IDENTIFICAÇÃO / LOGIN DO TÉCNICO                                   -->
+  <!-- ========================================================================= -->
+  <div id="modalUsuario"
+    class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-brand-cardBg border border-brand-cyan/40 rounded-2xl w-full max-w-md p-5 shadow-2xl space-y-4">
+      <div class="flex justify-between items-center border-b border-brand-border pb-3">
+        <div class="flex items-center gap-2.5">
+          <div class="p-2 rounded-xl bg-cyan-950 border border-brand-cyan/50 text-brand-cyan">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+          </div>
+          <div>
+            <h3 class="font-bold text-white text-sm">Identificação do Técnico</h3>
+            <p class="text-xs text-brand-teal">Seu cadastro para assinar projetos e laudos</p>
+          </div>
+        </div>
+        <button type="button" onclick="fecharModalUsuario()"
+          class="text-slate-400 hover:text-white text-lg font-bold">&times;</button>
+      </div>
+
+      <form onsubmit="event.preventDefault(); salvarUsuarioAtivo();" class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1" for="modal_userNome">Nome Completo do Técnico
+            *</label>
+          <input type="text" id="modal_userNome" required placeholder="Ex: Eng. Roberto Santos"
+            class="w-full bg-[#070d14] border border-brand-border focus:border-brand-cyan rounded-lg px-3 py-2 text-xs text-white focus:outline-none" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1" for="modal_userTelefone">Telefone / WhatsApp
+            *</label>
+          <input type="text" id="modal_userTelefone" required placeholder="Ex: (11) 98765-4321"
+            oninput="formatarTelefone(this)"
+            class="w-full bg-[#070d14] border border-brand-border focus:border-brand-cyan rounded-lg px-3 py-2 text-xs text-white font-mono focus:outline-none" />
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-400 mb-1" for="modal_userRegistro">Registro (CFT /
+              CREA)</label>
+            <input type="text" id="modal_userRegistro" placeholder="Ex: CFT 123456-BR"
+              class="w-full bg-[#070d14] border border-brand-border rounded-lg px-2.5 py-1.5 text-xs text-white" />
+          </div>
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-400 mb-1" for="modal_userEmpresa">Empresa
+              Padrão</label>
+            <input type="text" id="modal_userEmpresa" placeholder="Ex: Tech Solutions TI"
+              class="w-full bg-[#070d14] border border-brand-border rounded-lg px-2.5 py-1.5 text-xs text-white" />
+          </div>
+        </div>
+
+        <!-- Técnicos cadastrados recentemente -->
+        <div id="modal_listaUsuariosRecentes" class="space-y-1.5 pt-2 hidden">
+          <span class="text-[10px] font-bold text-brand-teal uppercase tracking-wider block">Técnicos Salvos no
+            Navegador</span>
+          <div id="modal_usuariosContainer" class="max-h-28 overflow-y-auto space-y-1 pr-1"></div>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-2 border-t border-brand-border">
+          <button type="button" onclick="fecharModalUsuario()"
+            class="px-3 py-1.5 bg-[#070d14] hover:bg-[#122234] border border-brand-border text-slate-300 rounded-lg text-xs font-semibold">
+            Cancelar
+          </button>
+          <button type="submit"
+            class="px-4 py-1.5 bg-brand-cyan hover:bg-cyan-400 text-slate-950 font-bold rounded-lg text-xs shadow-md glow-cyan-sm">
+            Salvar & Ativar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL: GERENCIAMENTO DE PROJETOS E BACKUP                                -->
+  <!-- ========================================================================= -->
+  <div id="modalProjetos"
+    class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-brand-cardBg border border-brand-border rounded-2xl w-full max-w-xl p-5 shadow-2xl space-y-4">
+      <div class="flex justify-between items-center border-b border-brand-border pb-3">
+        <div class="flex items-center gap-2.5">
+          <div class="p-2 rounded-xl bg-cyan-950 border border-brand-cyan/50 text-brand-cyan">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+          </div>
+          <div>
+            <h3 class="font-bold text-white text-sm">Meus Projetos Salvos</h3>
+            <p class="text-xs text-brand-teal">Banco de dados local no navegador</p>
+          </div>
+        </div>
+        <button type="button" onclick="fecharModalProjetos()"
+          class="text-slate-400 hover:text-white text-lg font-bold">&times;</button>
+      </div>
+
+      <!-- Ações de Backup -->
+      <div
+        class="flex flex-wrap justify-between items-center gap-2 bg-[#070d14] p-2.5 rounded-xl border border-brand-border">
+        <span class="text-xs text-slate-400">Backup dos Projetos:</span>
+        <div class="flex gap-2">
+          <button type="button" onclick="exportarBackupJSON()"
+            class="text-xs bg-[#0f1d2e] hover:bg-[#162a42] text-brand-cyan border border-cyan-800/60 rounded-lg px-2.5 py-1 font-semibold transition">
+            Exportar JSON
+          </button>
+          <label
+            class="text-xs bg-[#0f1d2e] hover:bg-[#162a42] text-brand-sky border border-cyan-800/60 rounded-lg px-2.5 py-1 font-semibold transition cursor-pointer">
+            Importar JSON
+            <input type="file" id="inputImportarJSON" accept=".json" onchange="importarBackupJSON(event)"
+              class="hidden" />
+          </label>
+        </div>
+      </div>
+
+      <!-- Lista de Projetos -->
+      <div class="space-y-2">
+        <div id="listaProjetosContainer" class="max-h-64 overflow-y-auto space-y-2 pr-1">
+          <!-- Renderizado via JavaScript -->
+        </div>
+      </div>
+
+      <div class="flex justify-between items-center pt-3 border-t border-brand-border">
+        <button type="button" onclick="novoProjetoLimpo()"
+          class="text-xs text-rose-400 hover:text-rose-300 font-medium">
+          Limpar e Iniciar Novo Projeto
+        </button>
+        <button type="button" onclick="fecharModalProjetos()"
+          class="px-4 py-1.5 bg-[#070d14] hover:bg-[#122234] border border-brand-border text-slate-200 rounded-lg text-xs font-semibold">
+          Fechar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MOTOR DE CÁLCULO E PERSISTÊNCIA (ENGINE V3.0)                              -->
+  <!-- ========================================================================= -->
+  <script>
+    // ESTADO GLOBAL DO INFRASPEC v3.0
+    const ESTADO = {
+      usuarioAtivo: null,
+      projetoAtivo: {
+        id: 'proj_' + Date.now(),
+        nome: 'Projeto Sem Nome',
+        cliente: 'Cliente Padrão',
+        empresa: 'Tech Solutions TI',
+        registro: '',
+        dataAtualizacao: new Date().toISOString()
+      },
+      moduloAtual: 'cabeamento',
+      dadosCab: {},
+      dadosCFTV: {},
+      dadosEnergia: {},
+      dadosWiFi: {},
+      itensCalculadosCab: [],
+      itensCalculadosCFTV: [],
+      itensCalculadosEnergia: [],
+      itensCalculadosWiFi: []
+    };
+
+    // =========================================================================
+    // NAVEGAÇÃO DE MÓDULOS (SPA TABS)
+    // =========================================================================
+    function selecionarModulo(moduloId) {
+      ESTADO.moduloAtual = moduloId;
+      document.querySelectorAll('.modulo-view').forEach(el => el.classList.add('hidden'));
+
+      const target = document.getElementById(`modulo_${moduloId}`);
+      if (target) target.classList.remove('hidden');
+
+      // Atualiza estilo das abas
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('bg-cyan-950', 'text-brand-cyan', 'border', 'border-cyan-800/80', 'shadow-sm');
+        btn.classList.add('text-slate-400');
+      });
+
+      const activeBtn = document.getElementById(`tabBtn_${moduloId}`);
+      if (activeBtn) {
+        activeBtn.classList.remove('text-slate-400');
+        activeBtn.classList.add('bg-cyan-950', 'text-brand-cyan', 'border', 'border-cyan-800/80', 'shadow-sm');
+      }
+
+      // Se navegou para o consolidado, atualiza-o
+      if (moduloId === 'consolidado') {
+        renderizarLaudoConsolidado();
+      }
+    }
+
+    function alternarTodosAcordeoes(abrir, classe) {
+      document.querySelectorAll(`.${classe}`).forEach(acc => acc.open = abrir);
+    }
+
+    function sincronizarNomeProjeto() {
+      const nome = document.getElementById('projetoNome').value.trim() || 'Projeto Sem Nome';
+      ESTADO.projetoAtivo.nome = nome;
+      document.getElementById('cab_labelNomeProjeto').innerText = nome;
+      document.getElementById('consol_labelProjeto').innerText = nome;
+    }
+
+    // =========================================================================
+    // SISTEMA DE USUÁRIO & BANCO DE DADOS LOCAL
+    // =========================================================================
+    function carregarBancoUsuarios() {
+      const salvos = localStorage.getItem('infraspec_users');
+      return salvos ? JSON.parse(salvos) : [];
+    }
+
+    function salvarBancoUsuarios(lista) {
+      localStorage.setItem('infraspec_users', JSON.stringify(lista));
+    }
+
+    function formatarTelefone(input) {
+      let v = input.value.replace(/\D/g, "");
+      if (v.length > 11) v = v.substring(0, 11);
+      if (v.length > 10) {
+        v = v.replace(/^(\d{2})(\d{5})(\d{4})$/, "($1) $2-$3");
+      } else if (v.length > 5) {
+        v = v.replace(/^(\d{2})(\d{4})(\d{0,4})$/, "($1) $2-$3");
+      } else if (v.length > 2) {
+        v = v.replace(/^(\d{2})(\d{0,5})$/, "($1) $2");
+      }
+      input.value = v;
+    }
+
+    function inicializarUsuario() {
+      const activeId = localStorage.getItem('infraspec_active_user_id');
+      const usuarios = carregarBancoUsuarios();
+      let user = usuarios.find(u => u.id === activeId);
+
+      if (!user && usuarios.length > 0) {
+        user = usuarios[0];
+      }
+
+      if (user) {
+        ativarUsuario(user);
+      } else {
+        // Usuário padrão inicial
+        const defaultUser = {
+          id: 'usr_' + Date.now(),
+          nome: 'Eng. Roberto Santos',
+          telefone: '(11) 98765-4321',
+          registro: 'CFT 123456-BR',
+          empresa: 'Tech Solutions TI',
+          dataCadastro: new Date().toISOString()
+        };
+        salvarBancoUsuarios([defaultUser]);
+        ativarUsuario(defaultUser);
+      }
+    }
+
+    function ativarUsuario(user) {
+      ESTADO.usuarioAtivo = user;
+      localStorage.setItem('infraspec_active_user_id', user.id);
+
+      // Iniciais do Avatar
+      const partes = user.nome.trim().split(" ");
+      const iniciais = (partes[0][0] + (partes.length > 1 ? partes[partes.length - 1][0] : "")).toUpperCase();
+      document.getElementById('userAvatar').innerText = iniciais || 'IS';
+      document.getElementById('userDisplayName').innerText = user.nome;
+      document.getElementById('userDisplayPhone').innerText = user.telefone;
+
+      // Auto-preenchimento
+      if (user.empresa && !document.getElementById('projetoEmpresa').value) {
+        document.getElementById('projetoEmpresa').value = user.empresa;
+      }
+      if (user.registro && !document.getElementById('projetoRegistro').value) {
+        document.getElementById('projetoRegistro').value = user.registro;
+      }
+    }
+
+    function abrirModalUsuario() {
+      const u = ESTADO.usuarioAtivo;
+      if (u) {
+        document.getElementById('modal_userNome').value = u.nome || "";
+        document.getElementById('modal_userTelefone').value = u.telefone || "";
+        document.getElementById('modal_userRegistro').value = u.registro || "";
+        document.getElementById('modal_userEmpresa').value = u.empresa || "";
+      }
+
+      // Renderiza lista de usuários salvos
+      const usuarios = carregarBancoUsuarios();
+      const container = document.getElementById('modal_usuariosContainer');
+      const box = document.getElementById('modal_listaUsuariosRecentes');
+      container.innerHTML = "";
+
+      if (usuarios.length > 1) {
+        box.classList.remove('hidden');
+        usuarios.forEach(item => {
+          const div = document.createElement('div');
+          div.className = "flex justify-between items-center p-1.5 bg-[#070d14] rounded border border-brand-border text-xs";
+          div.innerHTML = `
+            <div>
+              <span class="font-bold text-white block">${item.nome}</span>
+              <span class="text-[10px] text-slate-400 font-mono">${item.telefone}</span>
+            </div>
+            <button type="button" onclick="trocarParaUsuario('${item.id}')" class="text-[10px] bg-cyan-950 text-brand-cyan hover:bg-cyan-900 px-2 py-0.5 rounded border border-cyan-800">
+              Selecionar
+            </button>
+          `;
+          container.appendChild(div);
+        });
+      } else {
+        box.classList.add('hidden');
+      }
+
+      document.getElementById('modalUsuario').classList.remove('hidden');
+    }
+
+    function fecharModalUsuario() {
+      document.getElementById('modalUsuario').classList.add('hidden');
+    }
+
+    function salvarUsuarioAtivo() {
+      const nome = document.getElementById('modal_userNome').value.trim();
+      const telefone = document.getElementById('modal_userTelefone').value.trim();
+      const registro = document.getElementById('modal_userRegistro').value.trim();
+      const empresa = document.getElementById('modal_userEmpresa').value.trim();
+
+      if (!nome || !telefone) {
+        alert("Preencha ao menos Nome e Telefone.");
+        return;
+      }
+
+      let usuarios = carregarBancoUsuarios();
+      let user = usuarios.find(u => u.telefone === telefone);
+
+      if (user) {
+        user.nome = nome;
+        user.registro = registro;
+        user.empresa = empresa;
+      } else {
+        user = {
+          id: 'usr_' + Date.now(),
+          nome, telefone, registro, empresa,
+          dataCadastro: new Date().toISOString()
+        };
+        usuarios.push(user);
+      }
+
+      salvarBancoUsuarios(usuarios);
+      ativarUsuario(user);
+      fecharModalUsuario();
+    }
+
+    function trocarParaUsuario(id) {
+      const usuarios = carregarBancoUsuarios();
+      const user = usuarios.find(u => u.id === id);
+      if (user) {
+        ativarUsuario(user);
+        fecharModalUsuario();
+      }
+    }
+
+    // =========================================================================
+    // PERSISTÊNCIA DE PROJETOS NO LOCALSTORAGE
+    // =========================================================================
+    function carregarBancoProjetos() {
+      const salvos = localStorage.getItem('infraspec_projects_v3');
+      return salvos ? JSON.parse(salvos) : [];
+    }
+
+    function salvarBancoProjetos(lista) {
+      localStorage.setItem('infraspec_projects_v3', JSON.stringify(lista));
+    }
+
+    function coletarDadosFormulario() {
+      return {
+        projetoNome: document.getElementById('projetoNome').value,
+        projetoCliente: document.getElementById('projetoCliente').value,
+        projetoEmpresa: document.getElementById('projetoEmpresa').value,
+        projetoRegistro: document.getElementById('projetoRegistro').value,
+
+        // Cabeamento
+        cab_pontos: document.getElementById('cab_pontos').value,
+        cab_categoria: document.getElementById('cab_categoria').value,
+        cab_blindagem: document.getElementById('cab_blindagem').value,
+        cab_tipoMedicao: document.getElementById('cab_tipoMedicao').value,
+        cab_metragemAbsoluta: document.getElementById('cab_metragemAbsoluta').value,
+        cab_distanciaMedia: document.getElementById('cab_distanciaMedia').value,
+        cab_reserva: document.getElementById('cab_reserva').value,
+        cab_modoPuxamento: document.getElementById('cab_modoPuxamento').value,
+        cab_padraoPP: document.getElementById('cab_padraoPP').value,
+        cab_tipoPP: document.getElementById('cab_tipoPP').value,
+        cab_portasSwitch: document.getElementById('cab_portasSwitch').value,
+        cab_velocidadeSwitch: document.getElementById('cab_velocidadeSwitch').value,
+        cab_gerenciamentoSwitch: document.getElementById('cab_gerenciamentoSwitch').value,
+        cab_checkPCFabrica: document.getElementById('cab_checkPCFabrica').checked,
+        cab_checkPCManual: document.getElementById('cab_checkPCManual').checked,
+        cab_usarRotuladora: document.getElementById('cab_usarRotuladora').value,
+
+        // CFTV
+        cftv_integrarRackPrincipal: document.getElementById('cftv_integrarRackPrincipal').checked,
+        cftv_qtdTotal: document.getElementById('cftv_qtdTotal').value,
+        cftv_tecnologia: document.getElementById('cftv_tecnologia').value,
+        cftv_qtdExternas: document.getElementById('cftv_qtdExternas').value,
+        cftv_qtdInternas: document.getElementById('cftv_qtdInternas').value,
+        cftv_resolucao: document.getElementById('cftv_resolucao').value,
+        cftv_retencaoDias: document.getElementById('cftv_retencaoDias').value,
+        cftv_distanciaMedia: document.getElementById('cftv_distanciaMedia').value,
+
+        // Energia
+        nrg_importarCabeamento: document.getElementById('nrg_importarCabeamento').checked,
+        nrg_importarCFTV: document.getElementById('nrg_importarCFTV').checked,
+        nrg_tensaoEntrada: document.getElementById('nrg_tensaoEntrada').value,
+        nrg_autonomia: document.getElementById('nrg_autonomia').value,
+        nrg_qtdServidores: document.getElementById('nrg_qtdServidores').value,
+        nrg_qtdStorages: document.getElementById('nrg_qtdStorages').value,
+        nrg_cargasExtrasWatts: document.getElementById('nrg_cargasExtrasWatts').value,
+        nrg_checkDPSClamper: document.getElementById('nrg_checkDPSClamper').checked,
+        nrg_checkDPSRede: document.getElementById('nrg_checkDPSRede').checked,
+
+        // Wi-Fi
+        wifi_integrarCabeamento: document.getElementById('wifi_integrarCabeamento').checked,
+        wifi_perfilAmbiente: document.getElementById('wifi_perfilAmbiente').value,
+        wifi_qtdAPs: document.getElementById('wifi_qtdAPs').value,
+        wifi_padrao: document.getElementById('wifi_padrao').value,
+        wifi_gestao: document.getElementById('wifi_gestao').value,
+        wifi_alimentacao: document.getElementById('wifi_alimentacao').value,
+        wifi_tipoInstalacao: document.getElementById('wifi_tipoInstalacao').value
+      };
+    }
+
+    function aplicarDadosFormulario(dados) {
+      if (!dados) return;
+      for (const key in dados) {
+        const el = document.getElementById(key);
+        if (el) {
+          if (el.type === 'checkbox') el.checked = dados[key];
+          else el.value = dados[key];
+        }
+      }
+      alternarModoMedicaoCab();
+      sincronizarNomeProjeto();
+      calcularTodosOsModulos();
+    }
+
+    function salvarProjetoAtual() {
+      const nome = document.getElementById('projetoNome').value.trim() || 'Projeto Sem Nome';
+      const cliente = document.getElementById('projetoCliente').value.trim() || 'Cliente Padrão';
+      const dados = coletarDadosFormulario();
+
+      let projetos = carregarBancoProjetos();
+      const projId = ESTADO.projetoAtivo.id || ('proj_' + Date.now());
+
+      const index = projetos.findIndex(p => p.id === projId);
+      const novoRegistro = {
+        id: projId,
+        nome,
+        cliente,
+        userId: ESTADO.usuarioAtivo ? ESTADO.usuarioAtivo.id : null,
+        dataModificacao: new Date().toISOString(),
+        dados
+      };
+
+      if (index >= 0) {
+        projetos[index] = novoRegistro;
+      } else {
+        projetos.unshift(novoRegistro);
+      }
+
+      salvarBancoProjetos(projetos);
+      ESTADO.projetoAtivo.id = projId;
+      alert(`Projeto "${nome}" salvo com sucesso no navegador!`);
+    }
+
+    function abrirModalProjetos() {
+      const projetos = carregarBancoProjetos();
+      const container = document.getElementById('listaProjetosContainer');
+      container.innerHTML = "";
+
+      if (projetos.length === 0) {
+        container.innerHTML = `<div class="p-4 text-center text-slate-500 text-xs">Nenhum projeto salvo localmente.</div>`;
+      } else {
+        projetos.forEach(p => {
+          const data = new Date(p.dataModificacao).toLocaleString('pt-BR');
+          const div = document.createElement('div');
+          div.className = "flex justify-between items-center p-3 bg-[#070d14] rounded-xl border border-brand-border text-xs";
+          div.innerHTML = `
+            <div>
+              <span class="font-bold text-white block text-sm">${p.nome}</span>
+              <span class="text-slate-400 block text-[11px]">Cliente: ${p.cliente} • ${data}</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <button type="button" onclick="carregarProjetoPorId('${p.id}')" class="bg-cyan-950 hover:bg-cyan-900 text-brand-cyan border border-cyan-800/80 px-2.5 py-1 rounded font-semibold transition">
+                Carregar
+              </button>
+              <button type="button" onclick="excluirProjetoPorId('${p.id}')" class="text-rose-400 hover:text-rose-300 px-1.5 py-1">
+                🗑️
+              </button>
+            </div>
+          `;
+          container.appendChild(div);
+        });
+      }
+
+      document.getElementById('modalProjetos').classList.remove('hidden');
+    }
+
+    function fecharModalProjetos() {
+      document.getElementById('modalProjetos').classList.add('hidden');
+    }
+
+    function carregarProjetoPorId(id) {
+      const projetos = carregarBancoProjetos();
+      const p = projetos.find(item => item.id === id);
+      if (p) {
+        ESTADO.projetoAtivo.id = p.id;
+        aplicarDadosFormulario(p.dados);
+        fecharModalProjetos();
+      }
+    }
+
+    function excluirProjetoPorId(id) {
+      if (confirm("Deseja realmente excluir este projeto salvo?")) {
+        let projetos = carregarBancoProjetos();
+        projetos = projetos.filter(p => p.id !== id);
+        salvarBancoProjetos(projetos);
+        abrirModalProjetos();
+      }
+    }
+
+    function exportarBackupJSON() {
+      const payload = {
+        versao: 'InfraSpec 3.0',
+        dataExportacao: new Date().toISOString(),
+        usuarios: carregarBancoUsuarios(),
+        projetos: carregarBancoProjetos()
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `InfraSpec_Backup_${Date.now()}.json`;
+      a.click();
+    }
+
+    function importarBackupJSON(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        try {
+          const data = JSON.parse(e.target.result);
+          if (data.projetos) salvarBancoProjetos(data.projetos);
+          if (data.usuarios) salvarBancoUsuarios(data.usuarios);
+          alert("Backup restaurado com sucesso!");
+          location.reload();
+        } catch (err) {
+          alert("Erro ao ler arquivo JSON de backup: " + err.message);
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function novoProjetoLimpo() {
+      if (confirm("Deseja limpar todos os campos e iniciar um novo projeto?")) {
+        ESTADO.projetoAtivo.id = 'proj_' + Date.now();
+        document.getElementById('projetoNome').value = "";
+        document.getElementById('projetoCliente').value = "";
+        calcularTodosOsModulos();
+        fecharModalProjetos();
+      }
+    }
+
+    // =========================================================================
+    // CÁLCULO MÓDULO 1: CABEAMENTO ESTRUTURADO (ENGINE V2.3 INTEGRADA)
+    // =========================================================================
+    function alternarModoMedicaoCab() {
+      const modo = document.getElementById('cab_tipoMedicao').value;
+      const bAbs = document.getElementById('cab_blocoMetragemAbsoluta');
+      const bMed = document.getElementById('cab_blocoDistanciaMedia');
+      if (modo === 'absoluta') {
+        bAbs.classList.remove('hidden');
+        bMed.classList.add('hidden');
+      } else {
+        bAbs.classList.add('hidden');
+        bMed.classList.remove('hidden');
+      }
+    }
+
+    function calcularModuloCabeamento() {
+      const pontos = parseInt(document.getElementById('cab_pontos').value) || 0;
+      const categoria = document.getElementById('cab_categoria').value;
+      const blindagem = document.getElementById('cab_blindagem').value;
+      const tipoMedicao = document.getElementById('cab_tipoMedicao').value;
+      const reserva = parseFloat(document.getElementById('cab_reserva').value) || 0;
+      const modoPuxamento = document.getElementById('cab_modoPuxamento').value;
+      const padraoPP = parseInt(document.getElementById('cab_padraoPP').value);
+      const tipoPP = document.getElementById('cab_tipoPP').value;
+      const portasSwitch = parseInt(document.getElementById('cab_portasSwitch').value);
+      const velocidadeSwitch = document.getElementById('cab_velocidadeSwitch').value;
+      const gerenciamentoSwitch = document.getElementById('cab_gerenciamentoSwitch').value;
+      const hasFabrica = document.getElementById('cab_checkPCFabrica').checked;
+      const hasManual = document.getElementById('cab_checkPCManual').checked;
+      const usarRotuladora = document.getElementById('cab_usarRotuladora').value;
+
+      if (pontos <= 0) return;
+
+      // 1. Cabeamento Horizontal
+      let metrosBase = 0;
+      if (tipoMedicao === 'absoluta') {
+        metrosBase = parseFloat(document.getElementById('cab_metragemAbsoluta').value) || 0;
+      } else {
+        const distMedia = parseFloat(document.getElementById('cab_distanciaMedia').value) || 0;
+        metrosBase = pontos * distMedia;
+      }
+
+      // Se houver patch cords manuais adiciona metragem antes da reserva
+      let totalCabosManuais = hasManual ? (pontos * 2) : 0;
+      let metrosExtrasManual = hasManual ? (pontos * 0.5 + pontos * 2.5) : 0;
+      metrosBase += metrosExtrasManual;
+
+      const metrosTotais = Math.ceil(Number((metrosBase * (1 + (reserva / 100))).toFixed(2)));
+      const caixasPuras = Math.ceil(metrosTotais / 305);
+      let caixasFinal = caixasPuras;
+      let notaCaixas = "Mínimo métrico estrito";
+
+      if (modoPuxamento !== 'pura') {
+        const simultaneos = parseInt(modoPuxamento);
+        if (simultaneos > caixasPuras) {
+          caixasFinal = simultaneos;
+          notaCaixas = `Recomendado ${simultaneos} bobinas abertas p/ puxamento em paralelo`;
+        } else {
+          notaCaixas = `Atende ${simultaneos} cabos simultâneos (sobra ${caixasFinal - simultaneos} cx)`;
+        }
+      }
+
+      // 2. Conectividade
+      const keystones = (tipoPP === 'modular') ? Math.ceil((pontos * 2) * 1.05) : pontos;
+      const espelhos = Math.ceil(pontos / 2);
+      const moduloCego = (pontos % 2 !== 0) ? 1 : 0;
+      const conectoresRJ45Texto = (totalCabosManuais === 0) ? "1 pct (20 un)" : `${Math.max(20, Math.ceil((totalCabosManuais * 2) * 1.25))} un`;
+
+      // 3. Switches & Rack
+      const qtdPP = Math.ceil(pontos / padraoPP);
+      const usPP = (padraoPP === 24) ? qtdPP * 1 : qtdPP * 2;
+      const portasNecessarias = Math.ceil(pontos * 1.20);
+      const qtdSwitches = Math.ceil(portasNecessarias / portasSwitch);
+      const guias1U = qtdPP + qtdSwitches;
+      const usSwitches = qtdSwitches * 1;
+      const usBandejaNobreak = 3;
+      const tomadasNecessarias = qtdSwitches + 2;
+      const qtdReguas = Math.max(1, Math.ceil(tomadasNecessarias / 8));
+      const usOcupados = usPP + usSwitches + guias1U + usBandejaNobreak + qtdReguas;
+      const usComFolga = Math.ceil(usOcupados * 1.35);
+
+      const tamanhosComerciaisRack = [6, 9, 12, 16, 24, 36, 44];
+      let rackRecomendado = 44;
+      for (let t of tamanhosComerciaisRack) {
+        if (t >= usComFolga) { rackRecomendado = t; break; }
+      }
+      const tipoRack = (rackRecomendado <= 16) ? "Mini-Rack de Parede" : "Rack Fechado de Piso";
+
+      // 4. Validação Térmica
+      const isMiniRack = rackRecomendado <= 16;
+      const alertaTermico = isMiniRack && (qtdSwitches >= 2);
+      const boxTermico = document.getElementById('cab_boxAlertaTermico');
+      const msgTermico = document.getElementById('cab_msgAlertaTermico');
+      if (alertaTermico) {
+        boxTermico.classList.remove('hidden');
+        msgTermico.innerHTML = `Concentração de <strong>${qtdSwitches} switch(es)</strong> em mini-rack de parede fechado (${rackRecomendado}U). O sistema adicionou preventivamente um <strong>Kit de Ventilação Forçada (Coolers)</strong>.`;
+      } else {
+        boxTermico.classList.add('hidden');
+      }
+
+      // Atualiza Cards de Resumo
+      document.getElementById('cab_resumoMetros').innerText = `${metrosTotais} m`;
+      document.getElementById('cab_resumoCaixas').innerText = `${caixasFinal} cx`;
+      document.getElementById('cab_resumoSwitches').innerText = `${qtdSwitches} un`;
+      document.getElementById('cab_resumoRack').innerText = `${rackRecomendado} U`;
+
+      // Monta Lista de Itens do Módulo 1
+      const itens = [
+        { cat: "Cabeamento Horizontal", desc: `Cabo de Rede ${categoria} ${blindagem} 4 Pares Homologado Anatel`, qtd: `${caixasFinal} cx`, emb: `${metrosTotais} m calculados (${notaCaixas})` },
+        { cat: "Conectividade & Tomadas", desc: `Keystone Fêmea RJ45 ${categoria} ${blindagem} (90°/180°)`, qtd: `${keystones} un`, emb: tipoPP === 'modular' ? "Tomadas de parede + Patch Panel Modular (+5% folga)" : "Tomadas nos postos de trabalho" },
+        { cat: "Conectividade & Tomadas", desc: "Espelho de Parede 4x2 p/ 2 Conectores (Posto Duplo)", qtd: `${espelhos} un`, emb: moduloCego > 0 ? `Acompanha ${moduloCego} módulo cego para acabamento` : "Espelhos duplos padrão" },
+        { cat: "Conectividade & Tomadas", desc: `Conector RJ45 Macho ${categoria} ${blindagem} (EZ-Crimp Passante)`, qtd: conectoresRJ45Texto, emb: "Conectorização de patch cords e reparos técnicos" },
+        { cat: "Patch Cords", desc: `Patch Cord ${categoria} 0,5m Injetado / Homologado (Rack)`, qtd: `${pontos} un`, emb: "Manobra direta entre Switch e Patch Panel" },
+        { cat: "Patch Cords", desc: `Patch Cord ${categoria} 2,5m Injetado / Homologado (Posto)`, qtd: `${pontos} un`, emb: "Conexão de computadores nas tomadas de mesa" },
+        { cat: "Infraestrutura de Rack", desc: `Patch Panel ${padraoPP} Portas (${tipoPP === 'modular' ? 'Modular Descarregado' : 'IDC 110'})`, qtd: `${qtdPP} un`, emb: `Ocupação: ${usPP}U no rack` },
+        { cat: "Infraestrutura de Rack", desc: `Switch de Rack ${portasSwitch}P ${velocidadeSwitch} (${gerenciamentoSwitch})`, qtd: `${qtdSwitches} un`, emb: `Atende ${portasNecessarias} portas necessárias (+20% expansão)` },
+        { cat: "Infraestrutura de Rack", desc: "Guia de Cabos Horizontal 1U Fechada com Tampa", qtd: `${guias1U} un`, emb: "Organização frontal de patch cords" },
+        { cat: "Infraestrutura de Rack", desc: 'Régua PDU 19" 8 Tomadas NBR 14136 10A/20A (1U)', qtd: `${qtdReguas} un`, emb: "Distribuição elétrica estabilizada" },
+        { cat: "Infraestrutura de Rack", desc: `${tipoRack} ${rackRecomendado}U Padrão 19"`, qtd: "1 un", emb: `Ocupação calculada: ${usOcupados}U | Margem de folga 35%` }
+      ];
+
+      if (alertaTermico) {
+        itens.push({ cat: "Infraestrutura de Rack", desc: "Kit de Ventilação Forçada p/ Teto de Rack (2 Coolers Bivolt)", qtd: "1 kit", emb: "Exaustão mecânica preventiva para mini-rack" });
+      }
+
+      itens.push(
+        { cat: "Consumíveis & Identificação", desc: "Fita de Velcro Organizadora (Rolo 3m a 5m)", qtd: `${Math.max(1, Math.ceil(pontos / 24))} rolo(s)`, emb: "Feixes de cabos de dados (veda abraçadeira plástica)" },
+        { cat: "Consumíveis & Identificação", desc: "Abraçadeiras Plásticas de Nylon 150mm (Pacote c/ 100 un)", qtd: `${Math.max(1, Math.ceil(pontos / 24))} pct`, emb: "Fixação estrutural em esteiras e calhas" }
+      );
+
+      if (usarRotuladora === 'sim') {
+        itens.push({ cat: "Consumíveis & Identificação", desc: "Cartucho de Fita Laminada p/ Rotuladora Eletrônica", qtd: `${Math.max(1, Math.ceil((pontos * 4) / 150))} un`, emb: `Atende aprox. ${pontos * 4} identificações (A, B, PP e Tomada)` });
+      }
+
+      ESTADO.itensCalculadosCab = itens;
+      ESTADO.dadosCab = { pontos, metrosTotais, caixasFinal, qtdSwitches, rackRecomendado, usOcupados };
+      renderizarTabelaGenerica('cab_tabelaMateriais', itens);
+    }
+
+    // =========================================================================
+    // CÁLCULO MÓDULO 2: MONTAGEM DE RACK CFTV (SEGURANÇA ELETRÔNICA)
+    // =========================================================================
+    function alternarTecnologiaCFTV() {
+      calcularModuloCFTV();
+    }
+
+    function atualizarDistribuicaoCameras() {
+      const total = parseInt(document.getElementById('cftv_qtdTotal').value) || 0;
+      const ext = Math.ceil(total * 0.6);
+      const int = total - ext;
+      document.getElementById('cftv_qtdExternas').value = ext;
+      document.getElementById('cftv_qtdInternas').value = int;
+    }
+
+    function calcularModuloCFTV() {
+      const qtdTotal = parseInt(document.getElementById('cftv_qtdTotal').value) || 0;
+      const tecnologia = document.getElementById('cftv_tecnologia').value;
+      const qtdExternas = parseInt(document.getElementById('cftv_qtdExternas').value) || 0;
+      const qtdInternas = parseInt(document.getElementById('cftv_qtdInternas').value) || 0;
+      const resolucao = document.getElementById('cftv_resolucao').value;
+      const diasRetencao = parseInt(document.getElementById('cftv_retencaoDias').value) || 30;
+      const distMedia = parseFloat(document.getElementById('cftv_distanciaMedia').value) || 40;
+      const integrarRack = document.getElementById('cftv_integrarRackPrincipal').checked;
+
+      if (qtdTotal <= 0) return;
+
+      // 1. Bitrate & Storage (H.265)
+      let bitrateMbps = 2; // 2MP
+      if (resolucao === '4MP') bitrateMbps = 4;
+      if (resolucao === '8MP') bitrateMbps = 8;
+
+      // Fórmula Storage em TB: (Câmeras * Bitrate Mbps * 3600 * 24 * Dias) / (8 * 10^6 * 0.90 de formatação)
+      const storageBytes = (qtdTotal * (bitrateMbps * 1000 * 1000) * 86400 * diasRetencao) / 8;
+      const storageTB = Math.ceil(storageBytes / (1000 * 1000 * 1000 * 1000) / 0.90);
+
+      // Quantidade de HDs Western Digital Purple / SkyHawk
+      let qtdHDs = 1;
+      let tamanhoHD = 4;
+      if (storageTB <= 4) { tamanhoHD = 4; qtdHDs = 1; }
+      else if (storageTB <= 8) { tamanhoHD = 8; qtdHDs = 1; }
+      else if (storageTB <= 16) { tamanhoHD = 8; qtdHDs = 2; }
+      else { tamanhoHD = 8; qtdHDs = Math.ceil(storageTB / 8); }
+
+      // 2. Gravador NVR / DVR
+      let canaisGravador = 8;
+      if (qtdTotal > 32) canaisGravador = 64;
+      else if (qtdTotal > 16) canaisGravador = 32;
+      else if (qtdTotal > 8) canaisGravador = 16;
+      else if (qtdTotal > 4) canaisGravador = 8;
+      else canaisGravador = 4;
+
+      const tipoGravador = (tecnologia === 'IP_POE') ? `NVR ${canaisGravador} Canais 4K Padrão Rack 19"` : `DVR / XVR Multi-HD ${canaisGravador} Canais 1080p`;
+
+      // 3. Cabeamento e Conectividade
+      const metrosCaboCFTV = Math.ceil(qtdTotal * distMedia * 1.15); // +15% de curva
+      const bobinasCFTV = Math.max(1, Math.ceil(metrosCaboCFTV / 305));
+
+      // 4. Alimentação e Conexão de Campo
+      let switchPoETexto = "";
+      let fonteColmeiaTexto = "";
+      if (tecnologia === 'IP_POE') {
+        const portasPoE = (qtdTotal <= 8) ? 8 : (qtdTotal <= 16 ? 16 : 24);
+        const poeWatts = Math.ceil(qtdTotal * 15.4 * 1.25); // 15.4W af com 25% folga
+        switchPoETexto = `Switch PoE+ ${portasPoE} Portas Gigabit (PoE Budget: ${poeWatts}W)`;
+      } else {
+        const amperes = Math.ceil(qtdTotal * 1.2 * 1.25);
+        fonteColmeiaTexto = `Fonte Chaveada Colmeia 12V ${amperes}A Estabilizada`;
+      }
+
+      // 5. Rack CFTV
+      let rackCFTVTexto = "Aproveita Rack Central";
+      if (!integrarRack) {
+        rackCFTVTexto = (qtdTotal <= 16) ? "Mini-Rack Parede 9U c/ Chave" : "Mini-Rack Parede 12U c/ Chave";
+      }
+
+      // Atualiza Resumo CFTV
+      document.getElementById('cftv_labelTecnologia').innerText = (tecnologia === 'IP_POE') ? "IP PoE Corporativo" : "Analógico HD / Baluns";
+      document.getElementById('cftv_resumoNVR').innerText = `${canaisGravador} Canais`;
+      document.getElementById('cftv_resumoHD').innerText = `${storageTB} TB (${qtdHDs}x ${tamanhoHD}TB)`;
+      document.getElementById('cftv_resumoSwitch').innerText = (tecnologia === 'IP_POE') ? "Switch PoE" : "Fonte 12V";
+      document.getElementById('cftv_resumoRack').innerText = rackCFTVTexto;
+
+      // Monta Lista de Itens CFTV
+      const itens = [
+        { cat: "Gravador & Armazenamento", desc: tipoGravador, qtd: "1 un", emb: `Suporte a H.265+ e gravação contínua ${diasRetencao} dias` },
+        { cat: "Gravador & Armazenamento", desc: `HD Surveillance 24/7 ${tamanhoHD}TB (WD Purple / Seagate SkyHawk)`, qtd: `${qtdHDs} un`, emb: `Capacidade total calculada: ${storageTB} TB para ${diasRetencao} dias de retenção` },
+        { cat: "Câmeras de Segurança", desc: `Câmera Bullet Externa ${resolucao} (IP67, IR 30m+, Lente 2.8mm)`, qtd: `${qtdExternas} un`, emb: "Monitoramento perimetral e áreas abertas com visão noturna" },
+        { cat: "Câmeras de Segurança", desc: `Câmera Dome Interna ${resolucao} (IK10 Anti-vandalismo, Lente 2.8mm)`, qtd: `${qtdInternas} un`, emb: "Monitoramento de corredores, recepção e ambientes internos" }
+      ];
+
+      if (tecnologia === 'IP_POE') {
+        itens.push({ cat: "Conectividade & Rede PoE", desc: switchPoETexto, qtd: "1 un", emb: "Alimentação direta de câmeras IP via cabo UTP (802.3af/at)" });
+        itens.push({ cat: "Conectividade & Rede PoE", desc: "Patch Cords Cat6 1,0m Injetados de Fábrica", qtd: `${qtdTotal + 2} un`, emb: "Interligação entre Patch Panel, Switch PoE e NVR" });
+      } else {
+        itens.push({ cat: "Alimentação & Conexão Analógica", desc: fonteColmeiaTexto, qtd: "1 un", emb: "Alimentação centralizada 12V DC com proteção contra sobrecarga" });
+        itens.push({ cat: "Alimentação & Conexão Analógica", desc: "Par de Baluns Passivos de Vídeo HD com Proteção contra Surtos", qtd: `${qtdTotal} pares`, emb: "Transmissão de sinal de vídeo via cabo UTP até 300m" });
+        itens.push({ cat: "Alimentação & Conexão Analógica", desc: "Conector BNC com Mola e Parafuso + Plug P4 com Borne", qtd: `${qtdTotal * 2} un`, emb: "Conectorização nas câmeras e na régua do DVR" });
+      }
+
+      itens.push(
+        { cat: "Cabeamento & Acessórios de Campo", desc: "Cabo de Rede UTP Cat5e/Cat6 100% Cobre Homologado Anatel", qtd: `${bobinasCFTV} cx`, emb: `${metrosCaboCFTV} m calculados para lances de CFTV` },
+        { cat: "Cabeamento & Acessórios de Campo", desc: "Caixa de Sobrepor Hermética V Box IP66 para Câmeras", qtd: `${qtdTotal} un`, emb: "Alojamento estanque de conectores e baluns junto à câmera" }
+      );
+
+      if (!integrarRack) {
+        itens.push({ cat: "Infraestrutura de Rack CFTV", desc: `${rackCFTVTexto} Padrão 19"`, qtd: "1 un", emb: "Gabinete fechado com chave de segurança contra acesso não autorizado" });
+        itens.push({ cat: "Infraestrutura de Rack CFTV", desc: "Bandeja Fixa 1U para NVR / DVR", qtd: "1 un", emb: "Suporte mecânico do gravador no rack" });
+        itens.push({ cat: "Infraestrutura de Rack CFTV", desc: 'Régua PDU 19" 8 Tomadas NBR 14136', qtd: "1 un", emb: "Alimentação do NVR, switch e monitor local" });
+      }
+
+      ESTADO.itensCalculadosCFTV = itens;
+      ESTADO.dadosCFTV = { qtdTotal, storageTB, tecnologia, canaisGravador, integrarRack };
+      renderizarTabelaGenerica('cftv_tabelaMateriais', itens);
+    }
+
+    // =========================================================================
+    // CÁLCULO MÓDULO 3: ENERGIA, NOBREAKS & DPS CLAMPER
+    // =========================================================================
+    function calcularModuloEnergia() {
+      const importarCab = document.getElementById('nrg_importarCabeamento').checked;
+      const importarCFTV = document.getElementById('nrg_importarCFTV').checked;
+      const tensao = document.getElementById('nrg_tensaoEntrada').value;
+      const autonomiaMin = parseInt(document.getElementById('nrg_autonomia').value) || 30;
+      const qtdServidores = parseInt(document.getElementById('nrg_qtdServidores').value) || 0;
+      const qtdStorages = parseInt(document.getElementById('nrg_qtdStorages').value) || 0;
+      const cargasExtras = parseFloat(document.getElementById('nrg_cargasExtrasWatts').value) || 0;
+      const checkDPSClamper = document.getElementById('nrg_checkDPSClamper').checked;
+      const checkDPSRede = document.getElementById('nrg_checkDPSRede').checked;
+
+      // 1. Cargas em Watts
+      let wattsTotais = 0;
+
+      // Cargas importadas do cabeamento
+      let switchesCab = ESTADO.dadosCab.qtdSwitches || 1;
+      if (importarCab) {
+        wattsTotais += (switchesCab * 60); // 60W por switch corporativo
+        document.getElementById('nrg_descCargaCab').innerText = `${switchesCab} switch(es) de rede (~${switchesCab * 60}W)`;
+      } else {
+        document.getElementById('nrg_descCargaCab').innerText = "Cargas de cabeamento desconsideradas";
+      }
+
+      // Cargas importadas do CFTV
+      let camerasCFTV = ESTADO.dadosCFTV.qtdTotal || 0;
+      if (importarCFTV && camerasCFTV > 0) {
+        const wattsCFTV = (ESTADO.dadosCFTV.tecnologia === 'IP_POE') ? (camerasCFTV * 15 + 40) : (camerasCFTV * 12 + 30);
+        wattsTotais += wattsCFTV;
+        document.getElementById('nrg_descCargaCFTV').innerText = `${camerasCFTV} câmeras + gravador (~${wattsCFTV}W)`;
+      } else {
+        document.getElementById('nrg_descCargaCFTV').innerText = "Cargas de CFTV desconsideradas";
+      }
+
+      // Cargas extras
+      wattsTotais += (qtdServidores * 250);
+      wattsTotais += (qtdStorages * 120);
+      wattsTotais += cargasExtras;
+
+      // Margem de partida / segurança (30%)
+      const wattsComMargem = Math.ceil(wattsTotais * 1.30);
+      // Fator de Potência típico de TI = 0.70
+      const vaMinimo = Math.ceil(wattsComMargem / 0.70);
+
+      // Enquadramento comercial de Nobreak Senoidal
+      const tamanhosComerciaisVA = [1200, 1500, 2000, 2200, 3000, 5000];
+      let nobreakSugeridoVA = 5000;
+      for (let va of tamanhosComerciaisVA) {
+        if (va >= vaMinimo) { nobreakSugeridoVA = va; break; }
+      }
+
+      // Banco de Baterias para Autonomia
+      let moduloBateriaTexto = "Baterias Internas";
+      if (autonomiaMin >= 60) {
+        moduloBateriaTexto = "Módulo Externo 24V/36V";
+      } else if (autonomiaMin >= 120) {
+        moduloBateriaTexto = "Módulo Duplo Estacionário";
+      }
+
+      // Atualiza Cards de Resumo Energia
+      document.getElementById('nrg_resumoWatts').innerText = `${wattsComMargem} W`;
+      document.getElementById('nrg_resumoVA').innerText = `${vaMinimo} VA`;
+      document.getElementById('nrg_resumoNobreak').innerText = `${nobreakSugeridoVA} VA Senoidal`;
+      document.getElementById('nrg_resumoBateria').innerText = moduloBateriaTexto;
+
+      // Monta Lista de Materiais de Energia
+      const itens = [
+        { cat: "Condicionamento & Nobreak", desc: `Nobreak Senoidal Puro ${nobreakSugeridoVA}VA (${tensao}) Padrão Torre/Rack 19"`, qtd: "1 un", emb: `Suporta carga crítica de ${wattsComMargem}W com FP 0.7 e zero ruído harmônico` }
+      ];
+
+      if (autonomiaMin >= 60) {
+        itens.push({ cat: "Condicionamento & Nobreak", desc: `Módulo de Expansão de Baterias Estacionárias Seladas (${moduloBateriaTexto})`, qtd: "1 un", emb: `Garante autonomia estendida para ${autonomiaMin} minutos em carga contínua` });
+      }
+
+      if (checkDPSClamper) {
+        itens.push({ cat: "Proteção contra Surtos Elétricos", desc: "Dispositivo Protetor contra Surtos (DPS) CLAMPER Classe II 20kA/45kA", qtd: "1 kit", emb: "Proteção contra descargas atmosféricas e surtos na rede elétrica (NBR 5410)" });
+        itens.push({ cat: "Proteção contra Surtos Elétricos", desc: "Filtro de Linha e Protetor iClamper Energia 8 Tomadas NBR 14136", qtd: "1 un", emb: "Atenuação de ruídos RFI/EMI e micro-surtos de manobra" });
+      }
+
+      if (checkDPSRede) {
+        const qtdDPSRede = Math.max(2, camerasCFTV > 0 ? Math.ceil(camerasCFTV * 0.4) : 2);
+        itens.push({ cat: "Proteção contra Surtos Elétricos", desc: "Protetor de Surto para Linha de Dados CLAMPER Cabo Ethernet RJ45 PoE", qtd: `${qtdDPSRede} un`, emb: "Proteção de portas de switches contra descargas induzidas em cabos externos" });
+      }
+
+      itens.push({ cat: "Aterramento Técnico (NBR 5410)", desc: "Barra de Aterramento e Equipotencialização em Cobre p/ Rack 19\"", qtd: "1 kit", emb: "Interligação de aterramento das carcaças metálicas com cabo verde 6mm²" });
+
+      ESTADO.itensCalculadosEnergia = itens;
+      ESTADO.dadosEnergia = { wattsComMargem, vaMinimo, nobreakSugeridoVA, moduloBateriaTexto };
+      renderizarTabelaGenerica('nrg_tabelaMateriais', itens);
+    }
+
+    // =========================================================================
+    // CÁLCULO MÓDULO 4: AMPLIAÇÃO WI-FI CORPORATIVO
+    // =========================================================================
+    function atualizarSugeridoWiFi() {
+      const perfil = document.getElementById('wifi_perfilAmbiente').value;
+      if (perfil === 'alta_densidade') {
+        document.getElementById('wifi_padrao').value = 'WiFi6E_7';
+      }
+    }
+
+    function calcularModuloWiFi() {
+      const perfil = document.getElementById('wifi_perfilAmbiente').value;
+      const qtdAPs = parseInt(document.getElementById('wifi_qtdAPs').value) || 0;
+      const padrao = document.getElementById('wifi_padrao').value;
+      const gestao = document.getElementById('wifi_gestao').value;
+      const alimentacao = document.getElementById('wifi_alimentacao').value;
+      const tipoInstalacao = document.getElementById('wifi_tipoInstalacao').value;
+      const integrarCab = document.getElementById('wifi_integrarCabeamento').checked;
+
+      if (qtdAPs <= 0) return;
+
+      const padraoNome = (padrao === 'WiFi6E_7') ? "Wi-Fi 6E/7 Tri-Band Multi-Gig" : (padrao === 'WiFi6' ? "Wi-Fi 6 (802.11ax) Dual-Band" : "Wi-Fi 5 Wave 2");
+      const poeBudgetEst = qtdAPs * 25; // 25W por AP Wi-Fi 6/7
+
+      // Resumo Wi-Fi
+      document.getElementById('wifi_resumoAPs').innerText = `${qtdAPs} APs`;
+      document.getElementById('wifi_resumoSwitch').innerText = (alimentacao === 'switch_poe') ? "Switch PoE+" : `${qtdAPs}x Injetores`;
+      document.getElementById('wifi_resumoGestao').innerText = (gestao === 'cloud') ? "Cloud Manager" : "Hardware 1U";
+      document.getElementById('wifi_resumoPoEWatts').innerText = `${poeBudgetEst} W`;
+
+      // Monta Lista Wi-Fi
+      const itens = [
+        { cat: "Equipamentos Wi-Fi Corporativo", desc: `Access Point Corporativo ${padraoNome} PoE`, qtd: `${qtdAPs} un`, emb: `Cobertura corporativa de alta performance (${perfil})` }
+      ];
+
+      if (gestao === 'cloud') {
+        itens.push({ cat: "Gerenciamento & Controle", desc: "Licença de Gestão em Nuvem (Cloud Controller / Zero-Touch Provisioning)", qtd: `${qtdAPs} licenças`, emb: "Monitoramento centralizado, roaming rápido e portal de visitantes" });
+      } else {
+        itens.push({ cat: "Gerenciamento & Controle", desc: "Appliance Hardware Controller para Rack 19\" (1U)", qtd: "1 un", emb: "Controladora física local para gestão de SSIDs e VLANs" });
+      }
+
+      if (alimentacao === 'switch_poe') {
+        const portasSwitch = (qtdAPs <= 8) ? 8 : (qtdAPs <= 16 ? 16 : 24);
+        itens.push({ cat: "Alimentação & Infraestrutura PoE", desc: `Switch PoE+ 802.3at ${portasSwitch} Portas Gigabit (PoE Budget: ${poeBudgetEst + 50}W)`, qtd: "1 un", emb: "Alimentação e conectividade dedicada para os pontos de acesso" });
+      } else {
+        itens.push({ cat: "Alimentação & Infraestrutura PoE", desc: "Injetor PoE Gigabit 802.3at Individual", qtd: `${qtdAPs} un`, emb: "Alimentação individual via fonte injetora de tomada" });
+      }
+
+      itens.push(
+        { cat: "Acessórios de Instalação de Teto", desc: "Kit de Fixação em Perfil T de Forro / Suporte de Gesso", qtd: `${qtdAPs} un`, emb: "Fixação estética e segura em forro rebaixado" },
+        { cat: "Acessórios de Instalação de Teto", desc: "Patch Cord Cat6 Slim 1,5m Injetado", qtd: `${qtdAPs} un`, emb: "Conexão flexível entre a caixa de teto e a porta do Access Point" }
+      );
+
+      if (integrarCab) {
+        itens.push({ cat: "Acessórios de Instalação de Teto", desc: "Tomada Keystone Fêmea Cat6 RJ45 (Caixa de Consolidação)", qtd: `${qtdAPs} un`, emb: "Ponto de rede dedicado no entreforro para cada AP" });
+      }
+
+      ESTADO.itensCalculadosWiFi = itens;
+      ESTADO.dadosWiFi = { qtdAPs, padraoNome, poeBudgetEst };
+      renderizarTabelaGenerica('wifi_tabelaMateriais', itens);
+    }
+
+    // =========================================================================
+    // CÁLCULO GERAL E MÓDULO 5: LAUDO CONSOLIDADO
+    // =========================================================================
+    function calcularTodosOsModulos() {
+      calcularModuloCabeamento();
+      calcularModuloCFTV();
+      calcularModuloEnergia();
+      calcularModuloWiFi();
+      renderizarLaudoConsolidado();
+    }
+
+    function renderizarLaudoConsolidado() {
+      const incCab = document.getElementById('chkConsol_cab').checked;
+      const incCFTV = document.getElementById('chkConsol_cftv').checked;
+      const incEnergia = document.getElementById('chkConsol_energia').checked;
+      const incWiFi = document.getElementById('chkConsol_wifi').checked;
+
+      const tbody = document.getElementById('tabelaConsolidadaMateriais');
+      tbody.innerHTML = "";
+
+      let itensConsolidados = [];
+
+      if (incCab) {
+        ESTADO.itensCalculadosCab.forEach(i => itensConsolidados.push({ modulo: "1. Cabeamento & Redes", ...i }));
+      }
+      if (incCFTV) {
+        ESTADO.itensCalculadosCFTV.forEach(i => itensConsolidados.push({ modulo: "2. CFTV & Vigilância", ...i }));
+      }
+      if (incEnergia) {
+        ESTADO.itensCalculadosEnergia.forEach(i => itensConsolidados.push({ modulo: "3. Energia & Nobreak", ...i }));
+      }
+      if (incWiFi) {
+        ESTADO.itensCalculadosWiFi.forEach(i => itensConsolidados.push({ modulo: "4. Expansão Wi-Fi", ...i }));
+      }
+
+      document.getElementById('consol_totalItensBadge').innerText = `${itensConsolidados.length} itens listados`;
+
+      // Métricas Globais
+      const totalPontos = (ESTADO.dadosCab.pontos || 0) + (ESTADO.dadosCFTV.qtdTotal || 0) + (ESTADO.dadosWiFi.qtdAPs || 0);
+      const totalMetros = (ESTADO.dadosCab.metrosTotais || 0);
+      const totalWatts = (ESTADO.dadosEnergia.wattsComMargem || 0);
+      const rackPrincipal = (ESTADO.dadosCab.rackRecomendado || 0);
+
+      document.getElementById('consol_resumoPontos').innerText = `${totalPontos} pts`;
+      document.getElementById('consol_resumoMetros').innerText = `${totalMetros} m`;
+      document.getElementById('consol_resumoCarga').innerText = `${totalWatts} W`;
+      document.getElementById('consol_resumoRacks').innerText = `${rackPrincipal} U`;
+
+      // Renderiza Tabela Agrupada por Módulo
+      let moduloAtual = "";
+      itensConsolidados.forEach(item => {
+        if (item.modulo !== moduloAtual) {
+          moduloAtual = item.modulo;
+          const trHeader = document.createElement('tr');
+          trHeader.className = "bg-[#091522] font-bold text-brand-cyan text-[11px] uppercase tracking-wider break-inside-avoid border-t border-b border-brand-border";
+          trHeader.innerHTML = `<td colspan="3" class="py-2.5 px-3">${moduloAtual}</td>`;
+          tbody.appendChild(trHeader);
+        }
+
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-cyan-950/20 transition-colors break-inside-avoid";
+        tr.innerHTML = `
+          <td class="py-2.5 px-3 font-semibold text-slate-200">
+            <span class="text-[10px] text-slate-400 block font-normal">${item.cat}</span>
+            ${item.desc}
+          </td>
+          <td class="py-2.5 px-3 text-center font-bold text-brand-cyan font-mono bg-cyan-950/30">${item.qtd}</td>
+          <td class="py-2.5 px-3 text-xs text-slate-400">${item.emb}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderizarTabelaGenerica(elementId, itens) {
+      const tbody = document.getElementById(elementId);
+      if (!tbody) return;
+      tbody.innerHTML = "";
+
+      let catAtual = "";
+      itens.forEach(item => {
+        if (item.cat !== catAtual) {
+          catAtual = item.cat;
+          const trCat = document.createElement('tr');
+          trCat.className = "bg-[#070e17] font-bold text-slate-400 text-[10px] uppercase tracking-wider break-inside-avoid border-t border-b border-brand-border";
+          trCat.innerHTML = `<td colspan="3" class="py-1.5 px-3">${catAtual}</td>`;
+          tbody.appendChild(trCat);
+        }
+
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-cyan-950/20 transition-colors break-inside-avoid";
+        tr.innerHTML = `
+          <td class="py-2 px-3 font-semibold text-slate-200">${item.desc}</td>
+          <td class="py-2 px-3 text-center font-bold text-brand-cyan font-mono bg-cyan-950/20">${item.qtd}</td>
+          <td class="py-2 px-3 text-xs text-slate-400">${item.emb}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // =========================================================================
+    // EXPORTAÇÕES E IMPRESSÃO ABNT
+    // =========================================================================
+    function prepararEImprimirLaudo() {
+      // Sincroniza dados com o cabeçalho impresso ABNT
+      const projeto = document.getElementById('projetoNome').value.trim() || "Vistoria Técnica Padrão";
+      const cliente = document.getElementById('projetoCliente').value.trim() || "Cliente Contratante";
+      const empresa = document.getElementById('projetoEmpresa').value.trim() || (ESTADO.usuarioAtivo ? ESTADO.usuarioAtivo.empresa : "Tech Solutions TI");
+      const resp = ESTADO.usuarioAtivo ? ESTADO.usuarioAtivo.nome : "Engenharia Técnica";
+      const reg = document.getElementById('projetoRegistro').value.trim() || (ESTADO.usuarioAtivo ? ESTADO.usuarioAtivo.registro : "CFT / CREA");
+      const tel = ESTADO.usuarioAtivo ? ESTADO.usuarioAtivo.telefone : "-";
+
+      document.getElementById('printNomeProjeto').innerText = projeto;
+      document.getElementById('printNomeCliente').innerText = cliente;
+      document.getElementById('printNomeEmpresa').innerText = empresa;
+      document.getElementById('printRespTecnico').innerText = `Resp. Técnico: ${resp}`;
+      document.getElementById('printRegistro').innerText = `Registro: ${reg}`;
+      document.getElementById('printContato').innerText = `Contato: ${tel}`;
+
+      const agora = new Date();
+      document.getElementById('printDataEmissao').innerText = `Emitido em: ${agora.toLocaleDateString('pt-BR')} às ${agora.toLocaleTimeString('pt-BR')} | InfraSpec Engine v3.0`;
+      document.getElementById('printAssinaturaTecnico').innerText = `${resp} - ${reg}`;
+      document.getElementById('printAssinaturaCliente').innerText = `${cliente}`;
+
+      window.print();
+    }
+
+    function exportarCSVConsolidado() {
+      const nomeProjeto = document.getElementById('projetoNome').value || "InfraSpec_Projeto";
+      let csv = "Disciplina;Categoria;Descricao;Quantidade;Especificacao\n";
+
+      const trs = document.querySelectorAll('#tabelaConsolidadaMateriais tr');
+      let disciplina = "Geral";
+      trs.forEach(tr => {
+        const tds = tr.querySelectorAll('td');
+        if (tds.length === 1) {
+          disciplina = tds[0].innerText.replace(/;/g, ',');
+        } else if (tds.length === 3) {
+          const desc = tds[0].innerText.replace(/\n/g, ' ').replace(/;/g, ',');
+          const qtd = tds[1].innerText.replace(/;/g, ',');
+          const emb = tds[2].innerText.replace(/;/g, ',');
+          csv += `"${disciplina}";"${desc}";"${qtd}";"${emb}"\n`;
+        }
+      });
+
+      const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `${nomeProjeto.replace(/\s+/g, '_')}_Memorial_Quantitativo.csv`;
+      a.click();
+    }
+
+    function copiarListaConsolidada() {
+      const nomeProjeto = document.getElementById('projetoNome').value || "Projeto";
+      let texto = `=== INFRASPEC v3.0 - MEMORIAL TÉCNICO CONSOLIDADO ===\nPROJETO: ${nomeProjeto.toUpperCase()}\n\n`;
+
+      const trs = document.querySelectorAll('#tabelaConsolidadaMateriais tr');
+      trs.forEach(tr => {
+        const tds = tr.querySelectorAll('td');
+        if (tds.length === 1) {
+          texto += `\n[ ${tds[0].innerText.toUpperCase()} ]\n`;
+        } else if (tds.length === 3) {
+          texto += `• ${tds[0].innerText.replace(/\n/g, ' - ')}: ${tds[1].innerText} (${tds[2].innerText})\n`;
+        }
+      });
+
+      navigator.clipboard.writeText(texto).then(() => {
+        alert("Lista técnica unificada copiada para a área de transferência!");
+      });
+    }
+
+    function compartilharWhatsAppConsolidado() {
+      const nomeProjeto = document.getElementById('projetoNome').value || "Projeto";
+      let texto = `*InfraSpec v3.0 - Memorial Técnico Consolidado*\n`;
+      texto += `*Projeto:* ${nomeProjeto}\n\n`;
+
+      const trs = document.querySelectorAll('#tabelaConsolidadaMateriais tr');
+      trs.forEach(tr => {
+        const tds = tr.querySelectorAll('td');
+        if (tds.length === 1) {
+          texto += `\n*${tds[0].innerText}*\n`;
+        } else if (tds.length === 3) {
+          texto += `• *${tds[0].innerText.replace(/\n/g, ' ')}* -> ${tds[1].innerText}\n  _${tds[2].innerText}_\n`;
+        }
+      });
+
+      texto += `\n_Especificado e emitido via InfraSpec v3.0 Pro_`;
+      const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(texto)}`;
+      window.open(url, '_blank');
+    }
+
+    function copiarTabelaModulo(modulo) {
+      let nomeModulo = modulo.toUpperCase();
+      let texto = `=== INFRASPEC v3.0 - MÓDULO ${nomeModulo} ===\n\n`;
+
+      let itens = [];
+      if (modulo === 'cabeamento') itens = ESTADO.itensCalculadosCab;
+      if (modulo === 'cftv') itens = ESTADO.itensCalculadosCFTV;
+      if (modulo === 'energia') itens = ESTADO.itensCalculadosEnergia;
+      if (modulo === 'wifi') itens = ESTADO.itensCalculadosWiFi;
+
+      itens.forEach(i => {
+        texto += `• ${i.desc}: ${i.qtd} (${i.emb})\n`;
+      });
+
+      navigator.clipboard.writeText(texto).then(() => {
+        alert(`Quantitativo do módulo ${nomeModulo} copiado!`);
+      });
+    }
+
+    // =========================================================================
+    // INICIALIZAÇÃO NO CARREGAMENTO DA PÁGINA
+    // =========================================================================
+    window.onload = function () {
+      inicializarUsuario();
+      calcularTodosOsModulos();
+    };
+  </script>
+</body>
+
+</html>
